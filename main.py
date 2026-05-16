@@ -29,6 +29,7 @@ VACIO = 0
 OBSTACULO = 1
 JUGADOR = 2
 MANZANA = 3
+
 # Configuracion de obstaculos
 CANT_OBSTACULOS = random.randint(8,50)
 # Tamaño del tablero
