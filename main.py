@@ -1,7 +1,7 @@
 # Importamos módulos requeridos
 import os
 import random
-from random import*
+
 import pygame
 
 # Estados del juego
@@ -29,8 +29,8 @@ VACIO = 0
 OBSTACULO = 1
 JUGADOR = 2
 MANZANA = 3
-# Configuracion de obstaculos
-CANT_OBSTACULOS = random.randint(8,50)
+
+
 # Tamaño del tablero
 # Si se cambian estas constantes, se debe modificar la definición
 # del tablero que se encuentra en función reiniciar().
@@ -64,6 +64,9 @@ def aparecer_aleatorio(tablero, id_elem, incluir_borde=True):
 
 
 def poblar_tablero(tablero):
+
+    CANT_OBSTACULOS = random.randint(8,50)
+
     for i in range(CANT_OBSTACULOS):
         aparecer_aleatorio(tablero, OBSTACULO, incluir_borde=False)
     aparecer_aleatorio(tablero, MANZANA)
