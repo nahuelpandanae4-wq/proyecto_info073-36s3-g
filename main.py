@@ -22,14 +22,17 @@ PANTALLA_VICTORIA = "pantalla_victoria.bmp"
 PANTALLA_DERROTA = "pantalla_derrota.bmp"
 
 # Para evitar que el jugador se mueva demasiado rápido
-RETRASO = 100
+RETRASO = 200
 
 # Códigos de cada elemento del tablero
 VACIO = 0
 OBSTACULO = 1
 JUGADOR = 2
-MANZANA = 3
-
+MANZANA1 = 3
+MANZANA2 = 3
+MANZANA3 = 3
+# Cuantas manzanas se deben comer para ganar
+MANZANAS_PARA_GANAR = 3
 
 # Tamaño del tablero
 # Si se cambian estas constantes, se debe modificar la definición
@@ -69,7 +72,9 @@ def poblar_tablero(tablero):
 
     for i in range(CANT_OBSTACULOS):
         aparecer_aleatorio(tablero, OBSTACULO, incluir_borde=False)
-    aparecer_aleatorio(tablero, MANZANA)
+    aparecer_aleatorio(tablero, MANZANA1)
+    aparecer_aleatorio(tablero, MANZANA2)
+    aparecer_aleatorio(tablero, MANZANA3)
 
 
 def refrescar_tablero(screen, tablero):
@@ -119,7 +124,29 @@ def refrescar_tablero(screen, tablero):
                     (pos_x + radio, pos_y + radio),
                     radio,
                 )
-            elif tablero[i][j] == MANZANA:
+            elif tablero[i][j] == MANZANA1:
+                pygame.draw.rect(
+                    screen,
+                    "red",
+                    # Acá reducimos el tamaño del rectángulo
+                    # para identificarlo más fácilmente
+                    pygame.Rect(
+                        (pos_x + 10, pos_y + 10),
+                        (ancho_elem - 20, alto_elem - 20),
+                    ),
+                )
+            elif tablero[i][j] == MANZANA2:
+                pygame.draw.rect(
+                    screen,
+                    "red",
+                    # Acá reducimos el tamaño del rectángulo
+                    # para identificarlo más fácilmente
+                    pygame.Rect(
+                        (pos_x + 10, pos_y + 10),
+                        (ancho_elem - 20, alto_elem - 20),
+                    ),
+                )
+            elif tablero[i][j] == MANZANA1:
                 pygame.draw.rect(
                     screen,
                     "red",
@@ -180,7 +207,7 @@ def cambiar_direccion(keys, direccion_actual):
     return direccion_actual
 
 
-def avanzar(tablero, pos_jugador, direccion):
+def avanzar(tablero, pos_jugador, direccion, manzanas_comidas):
     """
     Avanza el jugador un paso en la dirección dada.
 
@@ -208,22 +235,33 @@ def avanzar(tablero, pos_jugador, direccion):
 
     # Verificamos que no haya choque con el borde del tablero.
     if not (0 <= ind_nueva_col < COLUMNAS and 0 <= ind_nueva_fila < FILAS):
-        return "derrota", pos_jugador
+        return "derrota", pos_jugador, manzanas_comidas
 
     # Obtenemos el elemento que se encuentre en el tablero en la nueva posición del jugador.
     pos_elem = tablero[ind_nueva_fila][ind_nueva_col]
 
     if pos_elem == OBSTACULO:
-        return "derrota", pos_jugador
+        return "derrota", pos_jugador, manzanas_comidas
 
-    if pos_elem == MANZANA:
-        return "victoria", (ind_nueva_col, ind_nueva_fila)
+    if pos_elem == MANZANA1:
+        manzanas_comidas += 1
+
+        # Mover al jugador a la nueva casilla
+        tablero[ind_actual_fila][ind_actual_col] = VACIO
+
+        tablero[ind_nueva_fila][ind_nueva_col] = JUGADOR
+
+        # Si llegamos al objetivo, victoria
+        if manzanas_comidas >= MANZANAS_PARA_GANAR:
+            return "victoria", (ind_nueva_col, ind_nueva_fila), manzanas_comidas
+            
+
 
     # Movimiento normal, si es que no encontramos manzana ni obstáculo.
     tablero[ind_actual_fila][ind_actual_col] = VACIO
     tablero[ind_nueva_fila][ind_nueva_col] = JUGADOR
 
-    return "ok", (ind_nueva_col, ind_nueva_fila)
+    return "ok", (ind_nueva_col, ind_nueva_fila), manzanas_comidas
 
 
 def reiniciar():
@@ -321,6 +359,7 @@ def main():
     pos_jugador = (0, 0)
     direccion = (0, 0)
     tiempo_ultimo_mov = 0
+    manzanas_comidas = 0
 
     mostrar_pantalla(screen, PANTALLA_INICIO)
 
@@ -342,6 +381,7 @@ def main():
                         # Obtiene tiempo en milisegundos
                         tiempo_ultimo_mov = pygame.time.get_ticks()
                         estado = ESTADO_JUGANDO
+                        manzanas_comidas = 0
                         refrescar_tablero(screen, tablero)
                     elif evento.key == pygame.K_i:
                         estado = ESTADO_INSTRUCCIONES
@@ -357,6 +397,7 @@ def main():
                         direccion = (0, 0)
                         tiempo_ultimo_mov = pygame.time.get_ticks()
                         estado = ESTADO_JUGANDO
+                        manzanas_comidas = 0
                         refrescar_tablero(screen, tablero)
 
                     if evento.key == pygame.K_ESCAPE:
@@ -372,8 +413,7 @@ def main():
             # La variable RETRASO hace que si no han pasado esa cantidad de ticks,
             # entonces no se avanzará en el tablero.
             if direccion != (0, 0) and tiempo_actual - tiempo_ultimo_mov >= RETRASO:
-                resultado, pos_jugador = avanzar(tablero, pos_jugador, direccion)
-
+                resultado, pos_jugador, manzanas_comidas = avanzar(tablero, pos_jugador, direccion, manzanas_comidas)
                 if resultado == "derrota":
                     estado = ESTADO_DERROTA
                     mostrar_pantalla(screen, PANTALLA_DERROTA)
