@@ -1,0 +1,459 @@
+# Importamos módulos requeridos
+import os
+import random
+
+import pygame 
+
+# Estados del juego
+ESTADO_INICIO = "inicio"
+ESTADO_INSTRUCCIONES = "instrucciones"
+ESTADO_JUGANDO = "jugando"
+ESTADO_DERROTA = "derrota"
+ESTADO_VICTORIA = "victoria"
+
+# Rutas a la carpeta de imágenes de pantallas
+DIR_PANTALLAS = os.path.join(os.path.dirname(__file__), "data", "pantallas")
+
+# Se específica el nombre del archivo para cada imagen de pantalla.
+# El formato de imagen utilizado puede ser PNG, JPG/JPEG, BMP, o GIF.
+PANTALLA_INICIO = "pantalla_inicio.bmp"
+PANTALLA_INSTRUCCIONES = "pantalla_instrucciones.bmp"
+PANTALLA_VICTORIA = "pantalla_victoria.bmp"
+PANTALLA_DERROTA = "pantalla_derrota.bmp"
+
+# Para evitar que el jugador se mueva demasiado rápido
+RETRASO = 200
+
+#TEMPORIZADOR
+TIEMPO_LIMITE = 60
+
+# Códigos de cada elemento del tablero
+VACIO = 0
+OBSTACULO = 1
+JUGADOR = 2
+MANZANA1 = 3
+MANZANA2 = 3
+MANZANA3 = 3
+# Cuantas manzanas se deben comer para ganar
+MANZANAS_PARA_GANAR = 3
+#Tiempo de la partida :1 minuto ( 60 segundos)
+TIEMPO_LIMITE = 60
+
+# Tamaño del tablero
+# Si se cambian estas constantes, se debe modificar la definición
+# del tablero que se encuentra en función reiniciar().
+FILAS = 15
+COLUMNAS = 15
+
+# Celdas que conforman el borde del tablero
+BORDE = (
+    [(c, 0) for c in range(COLUMNAS)]
+    + [(c, FILAS- 1) for c in range(COLUMNAS)]
+    + [(0, f) for f in range(1, FILAS- 1)]
+    + [(COLUMNAS- 1, f) for f in range(1, FILAS- 1)]
+)
+
+def aparecer_aleatorio(tablero, id_elem, incluir_borde=True):
+    vacios = []
+    for fila in range(FILAS):
+        for columna in range(COLUMNAS):
+            if tablero[fila][columna] == VACIO:
+                vacios.append((columna, fila))
+
+    if not incluir_borde:
+        vacios = [pos for pos in vacios if pos not in BORDE]
+
+    if len(vacios) == 0:
+        return-1,-1
+    
+    columna, fila = random.choice(vacios)
+    tablero[fila][columna] = id_elem
+    return columna, fila
+
+
+def poblar_tablero(tablero):
+
+    CANT_OBSTACULOS = random.randint(8,50)
+
+    for i in range(CANT_OBSTACULOS):
+        aparecer_aleatorio(tablero, OBSTACULO, incluir_borde=False)
+    aparecer_aleatorio(tablero, MANZANA1)
+    aparecer_aleatorio(tablero, MANZANA2)
+    aparecer_aleatorio(tablero, MANZANA3)
+
+
+def refrescar_tablero(screen, tablero, tiempo_texto= "01=00", manzanas=0, total=3):
+    """
+    Dibuja el estado actual del tablero en la pantalla.
+
+    Parámetros:
+        - screen: La pantalla sobre la cual estamos dibujando.
+        - tablero: El tablero con sus posiciones actuales.
+    """
+
+    # Rellena la pantalla con el color gris, básicamente pintando
+    # por encima de lo que estaba anteriormente.
+    screen.fill("gray30")
+
+
+    # definicion de disenos de elementos de tablero
+    wall = pygame.image.load("cajas.png").convert_alpha ()
+    manzanas= pygame.image.load("tuercas.png").convert_alpha ()
+    
+    ancho_elem = screen.get_width() / COLUMNAS
+    alto_elem = screen.get_height() / FILAS
+    wall = pygame.transform.scale(wall, (ancho_elem, alto_elem))
+    manzanas = pygame.transform.scale(manzanas, (ancho_elem, alto_elem))
+
+    fondo = pygame.image.load("fondo.jpg").convert()
+    fondo = pygame.transform.scale(fondo, screen.get_size())
+    screen.blit(fondo, (0, 0))
+
+    # Podemos calcular el tamaño en pixeles que tendrá cada
+    alto_elem = screen.get_height() / FILAS
+    # casilla al dividir tanto la altura de la pantalla (screen.get_height())
+    # como el ancho (screen.get_width()) por la cantidad de filas y columnas respectivamente.
+    # Por ejemplo en este caso alto_elem sería 800 / 15 = 53.3, lo que nos indica que la
+    # altura de cada elemento es de 53.3 píxeles.
+    alto_elem = screen.get_height() / FILAS
+    ancho_elem = screen.get_width() / COLUMNAS
+    # Como el jugador es un círculo, se necesita el radio.
+    radio = ancho_elem / 2
+
+    # Posición en eje "y" en unidad de píxeles.
+    pos_y = 0
+
+
+    for i in range(FILAS):
+        # Posición en eje "x" en unidad de píxeles.
+        pos_x = 0
+        for j in range(COLUMNAS):
+            if tablero[i][j] == OBSTACULO:
+                # Dibuja un rectángulo en la posición (pos_x, pos_y) y que sea
+                screen.blit(wall , [pos_x , pos_y])
+            elif tablero[i][j] == JUGADOR:
+                # Dibuja un círculo en la posición (pos_x + radio, pos_y + radio) 
+                pygame.draw.circle(screen, "green", (pos_x + radio, pos_y + radio), radio)
+                # de tamaño (ancho_elem, alto_elem) y color negro.
+            elif tablero[i][j] == MANZANA1:
+               screen.blit(manzanas, [pos_x, pos_y])
+            elif tablero[i][j] == MANZANA2:
+               screen.blit(manzanas, [pos_x, pos_y])
+            elif tablero[i][j] == MANZANA3:
+               screen.blit(manzanas, [pos_x, pos_y])
+
+            # Estamos recorriendo los píxeles de la pantalla, por lo que
+            # debemos sumar el ancho y altura en pixeles de cada elemento que
+            # ya hayamos recorrido para avanzar al siguiente.
+            pos_x += ancho_elem
+        pos_y += alto_elem
+
+    # Refresca el contenido que se ve en pantalla.
+    pygame.display.flip()
+
+
+def cambiar_direccion(keys, direccion_actual):
+    """
+    Cambia la dirección del jugador.
+
+    Parámetros:
+        - keys: Arreglo de teclas presionadas.
+        - direccion_actual: La dirección en la que estaba avanzando justo antes de analizar
+            si hubo un cambio de dirección.
+
+    Retorna:
+        - direccion_actual: La nueva dirección del jugador.
+    """
+
+    # Tecla W
+    if keys[pygame.K_w]:
+        # La tupla nos indica que horizontalmente (columnas) no hará nada (0) y
+        # que verticalmente (filas) disminuirá el índice en el tablero (-1).
+        return (0, -1)
+
+    # Tecla S
+    if keys[pygame.K_s]:
+        # En este caso avanzará a través de las filas del tablero.
+        return (0, 1)
+
+    # Tecla A
+    if keys[pygame.K_a]:
+        # Retrocede por las columnas del tablero.
+        return (-1, 0)
+
+    # Tecla D
+    if keys[pygame.K_d]:
+        # Avanza por las columnas del tablero.
+        return (1, 0)
+
+    # Si no se presiona ninguna de las teclas anteriores, la dirección
+    # será la misma que la anterior.
+    return direccion_actual
+
+
+def avanzar(tablero, pos_jugador, direccion, manzanas_comidas):
+    """
+    Avanza el jugador un paso en la dirección dada.
+
+    Parámetros:
+        - tablero: El tablero con sus posiciones actuales.
+        - pos_jugador: Tupla con la posición actual (índice con
+            estructura (columna, fila)) del jugador en el tablero.
+        - direccion: Tupla con la dirección en la que está avanzando actualmente el jugador.
+
+    Retorna:
+        - (resultado, nueva_pos_jugador): Retorna el resultado que se obtiene
+            al avanzar (derrota, victoria o "ok" (no cambia de pantalla)) y la nueva posición del jugador.
+    """
+
+    # Obtenemos los componentes "x" e "y" de cada tupla recibida
+    # con información de la dirección y posición del jugador.
+    dir_col, dir_fila = direccion
+    ind_actual_col, ind_actual_fila = (
+        pos_jugador  # Tupla (columna, fila) que representa los índices en el tablero.
+    )
+
+    # Aplicamos la dirección a la posición del jugador.
+    ind_nueva_col = ind_actual_col + dir_col
+    ind_nueva_fila = ind_actual_fila + dir_fila
+
+    # Verificamos que no haya choque con el borde del tablero.
+    if not (0 <= ind_nueva_col < COLUMNAS and 0 <= ind_nueva_fila < FILAS):
+        return "derrota", pos_jugador, manzanas_comidas
+
+    # Obtenemos el elemento que se encuentre en el tablero en la nueva posición del jugador.
+    pos_elem = tablero[ind_nueva_fila][ind_nueva_col]
+
+    if pos_elem == OBSTACULO:
+        return "derrota", pos_jugador, manzanas_comidas
+
+    if pos_elem == MANZANA1:
+        manzanas_comidas += 1
+
+        # Mover al jugador a la nueva casilla
+        tablero[ind_actual_fila][ind_actual_col] = VACIO
+
+        tablero[ind_nueva_fila][ind_nueva_col] = JUGADOR
+
+        # Si llegamos al objetivo, victoria
+        if manzanas_comidas >= MANZANAS_PARA_GANAR:
+            return "victoria", (ind_nueva_col, ind_nueva_fila), manzanas_comidas
+            
+
+
+    # Movimiento normal, si es que no encontramos manzana ni obstáculo.
+    tablero[ind_actual_fila][ind_actual_col] = VACIO
+    tablero[ind_nueva_fila][ind_nueva_col] = JUGADOR
+
+    return "ok", (ind_nueva_col, ind_nueva_fila), manzanas_comidas
+
+
+def reiniciar():
+    """
+    Crea un nuevo tablero y estado para una nueva partida.
+
+    Retorna:
+        - (tablero, pos_jugador): Tablero nuevo y la nueva posición aleatoria del jugador.
+            pos_jugador corresponda a una tupla (columna, fila) donde columna y fila son índices
+            de matriz tablero.
+    """
+
+    # Si se modifica constante FILAS o COLUMNAS al inicio, también
+    # se debe modificar este arreglo de tablero con los valores correspondientes.
+    # Esto puede ser mejorado usando dos bucles "for" anidados o comprensión de listas.
+    tablero = [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ]
+
+    # Usando dos bucles "for" anidados se haría de la siguiente manera:
+    # tablero = []
+    # for _ in range(FILAS):
+    #     fila_tablero = []
+    #
+    #     for _ in range(COLUMNAS):
+    #         fila_tablero.append(VACIO)
+    #
+    #     tablero.append(fila_tablero)
+    # Otra manera usando comprensión de listas:
+    # tablero = [[VACIO] * COLUMNAS for _ in range(FILAS)]
+    # El _ en el "for" indica que no usamos la variable con la que iteramos.
+
+    poblar_tablero(tablero)
+
+    # Colocamos al jugador en una posición aleatoria.
+    pos_jugador = aparecer_aleatorio(tablero, JUGADOR)
+
+    return tablero, pos_jugador
+
+
+def mostrar_pantalla(screen, nombre_archivo):
+    """
+    Carga una imagen y la muestra escalada a la ventana.
+
+    Parámetros:
+        - screen: La pantalla donde colocaremos la imagen.
+        - nombre_archivo: El nombre del archivo de la imagen.
+    """
+
+    ruta = os.path.join(DIR_PANTALLAS, nombre_archivo)
+
+    try:
+        imagen = pygame.image.load(ruta)
+        imagen = pygame.transform.scale(imagen, screen.get_size())
+
+        # Dibujamos la imagen en la pantalla en la coordenada (0, 0).
+        screen.blit(imagen, (0, 0))
+
+        # Refrescamos pantalla.
+        pygame.display.flip()
+    except FileNotFoundError:
+        # Fallback de seguridad en caso de que las imágenes no existan aún
+        screen.fill("black")
+        pygame.display.flip()
+        print(f"Advertencia: No se encontró la imagen {ruta}")
+
+def mostrar_temporizador(screen, tiempo_restante):
+    """
+    Muestra el temporizador en la esquina superior derecha.
+    
+    Parámetros:
+        - screen: La pantalla donde mostrar el temporizador.
+        - tiempo_restante: Segundos restantes.
+    """
+    # Crear fuente (tamaño 36)
+    fuente = pygame.font.Font(None, 36)
+    
+    # Color rojo si faltan menos de 10 segundos, blanco si no
+    color = "red" if tiempo_restante <= 10 else "white"
+    # Crear el texto
+    texto = fuente.render(f"Tiempo: {tiempo_restante}s", True, color)
+    
+    # Dibujarlo en la esquina superior derecha (con un poco de margen)
+    screen.blit(texto, (screen.get_width() - 200, 10))
+    
+    # Actualizar la pantalla
+    pygame.display.flip()
+
+def main():
+    pygame.init()
+
+    # Establecemos la resolución de la pantalla.
+    screen = pygame.display.set_mode((800, 800))
+
+    # Establecemos el título de la ventana.
+    pygame.display.set_caption("Juego Básico")
+
+    running = True
+
+    estado = ESTADO_INICIO
+    tablero = []
+    pos_jugador = (0, 0)
+    direccion = (0, 0)
+    tiempo_ultimo_mov = 0
+    manzanas_comidas = 0
+    # TEMPORIZADOR - Variable para rastrear cuándo comenzó el juego
+    tiempo_inicio_juego = 0
+    
+    # TEMPORIZADOR - Clock para controlar la velocidad de actualización
+    clock = pygame.time.Clock()
+
+    mostrar_pantalla(screen, PANTALLA_INICIO)
+
+    # Este es el bucle principal del juego, todo lo que sucede en el juego
+    # está aquí.
+    while running:
+        # Se analizan los eventos del bucle actual.
+        # TEMPORIZADOR - Limitar a 60 FPS (60 veces por segundo)
+        clock.tick(60)
+        
+        for evento in pygame.event.get():
+            # Si es que se quiere cerrar la ventana.
+            if evento.type == pygame.QUIT:
+                running = False
+
+            # Si es que se presiona alguna tecla.
+            if evento.type == pygame.KEYDOWN:
+                if estado == ESTADO_INICIO:
+                    if evento.key == pygame.K_SPACE:
+                        tablero, pos_jugador = reiniciar()
+                        direccion = (0, 0)
+                        # Obtiene tiempo en milisegundos
+                        tiempo_ultimo_mov = pygame.time.get_ticks()
+                        tiempo_inicio_juego = pygame.time.get_ticks()
+                        estado = ESTADO_JUGANDO
+                        manzanas_comidas = 0
+                        refrescar_tablero(screen, tablero, "01:00", 0, MANZANAS_PARA_GANAR)
+                        tiempo_inicio = pygame.time.get_ticks() #Reinicia tiempo a 1 minuto
+                    elif evento.key == pygame.K_i:
+                        estado = ESTADO_INSTRUCCIONES
+                        mostrar_pantalla(screen, PANTALLA_INSTRUCCIONES)
+
+                elif estado == ESTADO_INSTRUCCIONES:
+                    estado = ESTADO_INICIO
+                    mostrar_pantalla(screen, PANTALLA_INICIO)
+
+                elif estado in (ESTADO_DERROTA, ESTADO_VICTORIA):
+                    if evento.key == pygame.K_r:
+                        tablero, pos_jugador = reiniciar()
+                        direccion = (0, 0)
+                        tiempo_ultimo_mov = pygame.time.get_ticks()
+                        tiempo_inicio_juego = pygame.time.get_ticks()
+                        estado = ESTADO_JUGANDO
+                        manzanas_comidas = 0
+                        refrescar_tablero(screen, tablero, "01:00", 0, MANZANAS_PARA_GANAR)
+
+                    if evento.key == pygame.K_ESCAPE:
+                        estado = ESTADO_INICIO
+                        mostrar_pantalla(screen, PANTALLA_INICIO)
+
+                elif estado == ESTADO_JUGANDO:
+                    direccion = cambiar_direccion(pygame.key.get_pressed(), direccion)
+
+        if estado == ESTADO_JUGANDO:
+            tiempo_actual = pygame.time.get_ticks()  # En milisegundos
+
+            tiempo_transcurrido = (tiempo_actual - tiempo_inicio_juego) // 1000  # Convertir a segundos
+            tiempo_restante = TIEMPO_LIMITE - tiempo_transcurrido
+            
+
+            if tiempo_restante <= 0:
+                estado = ESTADO_DERROTA
+                mostrar_pantalla(screen, PANTALLA_DERROTA)
+
+            # La variable RETRASO hace que si no han pasado esa cantidad de ticks,
+            # entonces no se avanzará en el tablero.
+            elif direccion != (0, 0) and tiempo_actual - tiempo_ultimo_mov >= RETRASO:
+                resultado, pos_jugador, manzanas_comidas = avanzar(tablero, pos_jugador, direccion, manzanas_comidas)
+                if resultado == "derrota":
+                    estado = ESTADO_DERROTA
+                    mostrar_pantalla(screen, PANTALLA_DERROTA)
+                elif resultado == "victoria":
+                    estado = ESTADO_VICTORIA
+                    mostrar_pantalla(screen, PANTALLA_VICTORIA)
+                else:
+                    tiempo_ultimo_mov = tiempo_actual
+                    refrescar_tablero(screen, tablero, manzanas_comidas, MANZANAS_PARA_GANAR)
+                    mostrar_temporizador(screen, tiempo_restante)
+            else:
+                 mostrar_temporizador(screen, tiempo_restante)
+
+
+    pygame.quit()
+
+
+if __name__ == "__main__":
+    main()
