@@ -1,0 +1,13 @@
+G7
+├── bin/                       # Archivos ejecutables 
+│   ├── plantilla_basica.exe
+│   └── snake_completo.exe
+├── data/
+│   └── pantallas/             # Imágenes de pantallas (PNG, JPG/JPEG, BMP o GIF)
+├── main.py                    # Código principal de la plantilla
+├──.gitignore
+├──tuercas.png
+├──manzabas.wav
+├──cajas.png
+├──fondo,jpg
+└── README.md
