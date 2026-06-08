@@ -5,7 +5,7 @@ La **plantilla básica** es el punto de partida que se entrega a los equipos par
 ## Estructura del repositorio
 
 ```
-.
+G7
 ├── bin/                       # Archivos ejecutables 
 │   ├── plantilla_basica.exe
 │   └── snake_completo.exe
