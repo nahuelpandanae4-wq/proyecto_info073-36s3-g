@@ -2,7 +2,7 @@
 import os
 import random
 
-import pygame
+import pygame 
 
 # Estados del juego
 ESTADO_INICIO = "inicio"
@@ -24,6 +24,9 @@ PANTALLA_DERROTA = "pantalla_derrota.bmp"
 # Para evitar que el jugador se mueva demasiado rápido
 RETRASO = 200
 
+#TEMPORIZADOR
+TIEMPO_LIMITE = 60
+
 # Códigos de cada elemento del tablero
 VACIO = 0
 OBSTACULO = 1
@@ -33,6 +36,8 @@ MANZANA2 = 3
 MANZANA3 = 3
 # Cuantas manzanas se deben comer para ganar
 MANZANAS_PARA_GANAR = 3
+#Tiempo de la partida :1 minuto ( 60 segundos)
+TIEMPO_LIMITE = 60
 
 # Tamaño del tablero
 # Si se cambian estas constantes, se debe modificar la definición
@@ -77,7 +82,7 @@ def poblar_tablero(tablero):
     aparecer_aleatorio(tablero, MANZANA3)
 
 
-def refrescar_tablero(screen, tablero):
+def refrescar_tablero(screen, tablero, tiempo_texto= "01=00", manzanas=0, total=3):
     """
     Dibuja el estado actual del tablero en la pantalla.
 
@@ -90,7 +95,22 @@ def refrescar_tablero(screen, tablero):
     # por encima de lo que estaba anteriormente.
     screen.fill("gray30")
 
+
+    # definicion de disenos de elementos de tablero
+    wall = pygame.image.load("imagenes/elementos/cajas.png").convert_alpha ()
+    manzanas= pygame.image.load("imagenes/elementos/tuercas.png").convert_alpha ()
+    
+    ancho_elem = screen.get_width() / COLUMNAS
+    alto_elem = screen.get_height() / FILAS
+    wall = pygame.transform.scale(wall, (ancho_elem, alto_elem))
+    manzanas = pygame.transform.scale(manzanas, (ancho_elem, alto_elem))
+
+    fondo = pygame.image.load("imagenes/fondo/fondo.jpg").convert()
+    fondo = pygame.transform.scale(fondo, screen.get_size())
+    screen.blit(fondo, (0, 0))
+
     # Podemos calcular el tamaño en pixeles que tendrá cada
+    alto_elem = screen.get_height() / FILAS
     # casilla al dividir tanto la altura de la pantalla (screen.get_height())
     # como el ancho (screen.get_width()) por la cantidad de filas y columnas respectivamente.
     # Por ejemplo en este caso alto_elem sería 800 / 15 = 53.3, lo que nos indica que la
@@ -103,60 +123,24 @@ def refrescar_tablero(screen, tablero):
     # Posición en eje "y" en unidad de píxeles.
     pos_y = 0
 
+
     for i in range(FILAS):
         # Posición en eje "x" en unidad de píxeles.
         pos_x = 0
         for j in range(COLUMNAS):
             if tablero[i][j] == OBSTACULO:
                 # Dibuja un rectángulo en la posición (pos_x, pos_y) y que sea
-                # de tamaño (ancho_elem, alto_elem) y color negro.
-                pygame.draw.rect(
-                    screen,
-                    "black",
-                    pygame.Rect((pos_x, pos_y), (ancho_elem, alto_elem)),
-                )
+                screen.blit(wall , [pos_x , pos_y])
             elif tablero[i][j] == JUGADOR:
-                # Dibujamos un círculo verde en la posición (pos_x + radio, pos_y + radio),
-                # con un radio definido por la variable "radio" (ancho_elem / 2).
-                pygame.draw.circle(
-                    screen,
-                    "green",
-                    (pos_x + radio, pos_y + radio),
-                    radio,
-                )
+                # Dibuja un círculo en la posición (pos_x + radio, pos_y + radio) 
+                pygame.draw.circle(screen, "green", (pos_x + radio, pos_y + radio), radio)
+                # de tamaño (ancho_elem, alto_elem) y color negro.
             elif tablero[i][j] == MANZANA1:
-                pygame.draw.rect(
-                    screen,
-                    "red",
-                    # Acá reducimos el tamaño del rectángulo
-                    # para identificarlo más fácilmente
-                    pygame.Rect(
-                        (pos_x + 10, pos_y + 10),
-                        (ancho_elem - 20, alto_elem - 20),
-                    ),
-                )
+               screen.blit(manzanas, [pos_x, pos_y])
             elif tablero[i][j] == MANZANA2:
-                pygame.draw.rect(
-                    screen,
-                    "red",
-                    # Acá reducimos el tamaño del rectángulo
-                    # para identificarlo más fácilmente
-                    pygame.Rect(
-                        (pos_x + 10, pos_y + 10),
-                        (ancho_elem - 20, alto_elem - 20),
-                    ),
-                )
-            elif tablero[i][j] == MANZANA1:
-                pygame.draw.rect(
-                    screen,
-                    "red",
-                    # Acá reducimos el tamaño del rectángulo
-                    # para identificarlo más fácilmente
-                    pygame.Rect(
-                        (pos_x + 10, pos_y + 10),
-                        (ancho_elem - 20, alto_elem - 20),
-                    ),
-                )
+               screen.blit(manzanas, [pos_x, pos_y])
+            elif tablero[i][j] == MANZANA3:
+               screen.blit(manzanas, [pos_x, pos_y])
 
             # Estamos recorriendo los píxeles de la pantalla, por lo que
             # debemos sumar el ancho y altura en pixeles de cada elemento que
@@ -207,7 +191,7 @@ def cambiar_direccion(keys, direccion_actual):
     return direccion_actual
 
 
-def avanzar(tablero, pos_jugador, direccion, manzanas_comidas):
+def avanzar(tablero, pos_jugador, direccion, manzanas_comidas, sonido_manzana):
     """
     Avanza el jugador un paso en la dirección dada.
 
@@ -244,6 +228,7 @@ def avanzar(tablero, pos_jugador, direccion, manzanas_comidas):
         return "derrota", pos_jugador, manzanas_comidas
 
     if pos_elem == MANZANA1:
+        sonido_manzana.play()
         manzanas_comidas += 1
 
         # Mover al jugador a la nueva casilla
@@ -342,6 +327,27 @@ def mostrar_pantalla(screen, nombre_archivo):
         pygame.display.flip()
         print(f"Advertencia: No se encontró la imagen {ruta}")
 
+def mostrar_temporizador(screen, tiempo_restante):
+    """
+    Muestra el temporizador en la esquina superior derecha.
+    
+    Parámetros:
+        - screen: La pantalla donde mostrar el temporizador.
+        - tiempo_restante: Segundos restantes.
+    """
+    # Crear fuente (tamaño 36)
+    fuente = pygame.font.Font(None, 36)
+    
+    # Color rojo si faltan menos de 10 segundos, blanco si no
+    color = "red" if tiempo_restante <= 10 else "white"
+    # Crear el texto
+    texto = fuente.render(f"Tiempo: {tiempo_restante}s", True, color)
+    
+    # Dibujarlo en la esquina superior derecha (con un poco de margen)
+    screen.blit(texto, (screen.get_width() - 200, 10))
+    
+    # Actualizar la pantalla
+    pygame.display.flip()
 
 def main():
     pygame.init()
@@ -360,13 +366,27 @@ def main():
     direccion = (0, 0)
     tiempo_ultimo_mov = 0
     manzanas_comidas = 0
+    # TEMPORIZADOR - Variable para rastrear cuándo comenzó el juego
+    tiempo_inicio_juego = 0
+    
+    # TEMPORIZADOR - Clock para controlar la velocidad de actualización
+    clock = pygame.time.Clock()
 
     mostrar_pantalla(screen, PANTALLA_INICIO)
+
+    sonido_manzana = pygame.mixer.Sound("sonidos/interacciones/manzana.wav")
+
+    pygame.mixer.music.load("sonidos/principal/durante_juego.mp3")
+    pygame.mixer.music.play(-1)
+
 
     # Este es el bucle principal del juego, todo lo que sucede en el juego
     # está aquí.
     while running:
         # Se analizan los eventos del bucle actual.
+        # TEMPORIZADOR - Limitar a 60 FPS (60 veces por segundo)
+        clock.tick(60)
+        
         for evento in pygame.event.get():
             # Si es que se quiere cerrar la ventana.
             if evento.type == pygame.QUIT:
@@ -380,9 +400,11 @@ def main():
                         direccion = (0, 0)
                         # Obtiene tiempo en milisegundos
                         tiempo_ultimo_mov = pygame.time.get_ticks()
+                        tiempo_inicio_juego = pygame.time.get_ticks()
                         estado = ESTADO_JUGANDO
                         manzanas_comidas = 0
-                        refrescar_tablero(screen, tablero)
+                        refrescar_tablero(screen, tablero, "01:00", 0, MANZANAS_PARA_GANAR)
+                        tiempo_inicio = pygame.time.get_ticks() #Reinicia tiempo a 1 minuto
                     elif evento.key == pygame.K_i:
                         estado = ESTADO_INSTRUCCIONES
                         mostrar_pantalla(screen, PANTALLA_INSTRUCCIONES)
@@ -396,9 +418,10 @@ def main():
                         tablero, pos_jugador = reiniciar()
                         direccion = (0, 0)
                         tiempo_ultimo_mov = pygame.time.get_ticks()
+                        tiempo_inicio_juego = pygame.time.get_ticks()
                         estado = ESTADO_JUGANDO
                         manzanas_comidas = 0
-                        refrescar_tablero(screen, tablero)
+                        refrescar_tablero(screen, tablero, "01:00", 0, MANZANAS_PARA_GANAR)
 
                     if evento.key == pygame.K_ESCAPE:
                         estado = ESTADO_INICIO
@@ -410,10 +433,18 @@ def main():
         if estado == ESTADO_JUGANDO:
             tiempo_actual = pygame.time.get_ticks()  # En milisegundos
 
+            tiempo_transcurrido = (tiempo_actual - tiempo_inicio_juego) // 1000  # Convertir a segundos
+            tiempo_restante = TIEMPO_LIMITE - tiempo_transcurrido
+            
+
+            if tiempo_restante <= 0:
+                estado = ESTADO_DERROTA
+                mostrar_pantalla(screen, PANTALLA_DERROTA)
+
             # La variable RETRASO hace que si no han pasado esa cantidad de ticks,
             # entonces no se avanzará en el tablero.
-            if direccion != (0, 0) and tiempo_actual - tiempo_ultimo_mov >= RETRASO:
-                resultado, pos_jugador, manzanas_comidas = avanzar(tablero, pos_jugador, direccion, manzanas_comidas)
+            elif direccion != (0, 0) and tiempo_actual - tiempo_ultimo_mov >= RETRASO:
+                resultado, pos_jugador, manzanas_comidas = avanzar(tablero, pos_jugador, direccion, manzanas_comidas, sonido_manzana)
                 if resultado == "derrota":
                     estado = ESTADO_DERROTA
                     mostrar_pantalla(screen, PANTALLA_DERROTA)
@@ -422,7 +453,11 @@ def main():
                     mostrar_pantalla(screen, PANTALLA_VICTORIA)
                 else:
                     tiempo_ultimo_mov = tiempo_actual
-                    refrescar_tablero(screen, tablero)
+                    refrescar_tablero(screen, tablero, manzanas_comidas, MANZANAS_PARA_GANAR)
+                    mostrar_temporizador(screen, tiempo_restante)
+            else:
+                 mostrar_temporizador(screen, tiempo_restante)
+
 
     pygame.quit()
 
