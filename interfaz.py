@@ -5,6 +5,10 @@ from configuracion import *
 
 def dibujar_panel ( screen ) :
 
+    alto_elem = LADO_TABLERO / FILAS
+    ancho_elem = LADO_TABLERO / COLUMNAS
+    radio = ancho_elem / 2
+
     # Rectangulo del panel : empieza donde termina el tablero
     panel = pygame . Rect ( LADO_TABLERO , 0 , ANCHO_PANEL , ALTO_VENTANA )
     pygame . draw . rect ( screen , " gray15 ", panel )
@@ -19,6 +23,9 @@ def dibujar_panel ( screen ) :
     titulo = fuente1 . render (" SNAKE ", True , " white ")
     screen . blit ( titulo , (x , 30) )
 
+    pygame.draw.circle(screen, "red",(screen.get_width() - 200, 400), radio)
+    pygame.draw.circle(screen, "red",(screen.get_width() - 134, 400), radio)
+    pygame.draw.circle(screen, "red",(screen.get_width() - 68, 400), radio)
 
 def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=0,total=3):
     """

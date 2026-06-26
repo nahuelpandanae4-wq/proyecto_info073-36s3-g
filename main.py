@@ -27,6 +27,7 @@ def main():
     direccion = (0, 0)
     tiempo_ultimo_mov = 0
     manzanas_comidas = 0
+    vidas = 3
     # TEMPORIZADOR - Variable para rastrear cuándo comenzó el juego
     tiempo_inicio_juego = 0
     
@@ -57,7 +58,7 @@ def main():
             if evento.type == pygame.KEYDOWN:
                 if estado == ESTADO_INICIO:
                     if evento.key == pygame.K_SPACE:
-                        tablero, pos_jugador = reiniciar()
+                        tablero, pos_jugador, pos_inicial, vidas = reiniciar()
                         direccion = (0, 0)
                         # Obtiene tiempo en milisegundos
                         tiempo_ultimo_mov = pygame.time.get_ticks()
@@ -76,7 +77,7 @@ def main():
 
                 elif estado in (ESTADO_DERROTA, ESTADO_VICTORIA):
                     if evento.key == pygame.K_r:
-                        tablero, pos_jugador = reiniciar()
+                        tablero, pos_jugador, pos_inicial, vidas = reiniciar()
                         direccion = (0, 0)
                         tiempo_ultimo_mov = pygame.time.get_ticks()
                         tiempo_inicio_juego = pygame.time.get_ticks()
@@ -105,7 +106,7 @@ def main():
             # La variable RETRASO hace que si no han pasado esa cantidad de ticks,
             # entonces no se avanzará en el tablero.
             elif direccion != (0, 0) and tiempo_actual - tiempo_ultimo_mov >= RETRASO:
-                resultado, pos_jugador, manzanas_comidas = avanzar(tablero, pos_jugador, direccion, manzanas_comidas, sonido_manzana)
+                resultado, pos_jugador, manzanas_comidas, vidas, direccion = avanzar(tablero, pos_jugador, pos_inicial, direccion, manzanas_comidas, sonido_manzana,vidas)
                 if resultado == "derrota":
                     estado = ESTADO_DERROTA
                     mostrar_pantalla(screen, PANTALLA_DERROTA)

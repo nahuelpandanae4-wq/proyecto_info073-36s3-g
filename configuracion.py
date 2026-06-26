@@ -27,22 +27,23 @@ ANCHO_PANEL = ANCHO_VENTANA - LADO_TABLERO
 FILAS = 15
 COLUMNAS = 15
 
+# variables del tablero
 VACIO = 0
 OBSTACULO = 1
 JUGADOR = 2
 MANZANA = 3
 
+
 MANZANAS_PARA_GANAR = 3
+
 
 TIEMPO_LIMITE = 60
 RETRASO = 200
 
-DIR_PANTALLAS = os.path.join(
-    os.path.dirname(__file__),
-    "data",
-    "pantallas"
-)
+# crea una ruta a la carpeta de las pantallas
+DIR_PANTALLAS = os.path.join(os.path.dirname(__file__),"data","pantallas")
 
+# indica el borde de el tablero
 BORDE = (
     [(c, 0) for c in range(COLUMNAS)]
     + [(c, FILAS - 1) for c in range(COLUMNAS)]

@@ -41,7 +41,7 @@ def cambiar_direccion(keys, direccion_actual):
     return direccion_actual
 
 
-def avanzar(tablero, pos_jugador, direccion, manzanas_comidas, sonido_manzana):
+def avanzar(tablero, pos_jugador,pos_inicial, direccion, manzanas_comidas, sonido_manzana, vidas):
     """
     Avanza el jugador un paso en la dirección dada.
 
@@ -69,14 +69,27 @@ def avanzar(tablero, pos_jugador, direccion, manzanas_comidas, sonido_manzana):
 
     # Verificamos que no haya choque con el borde del tablero.
     if not (0 <= ind_nueva_col < COLUMNAS and 0 <= ind_nueva_fila < FILAS):
-        return "derrota", pos_jugador, manzanas_comidas
+            return "derrota", pos_jugador, manzanas_comidas, vidas, direccion
 
     # Obtenemos el elemento que se encuentre en el tablero en la nueva posición del jugador.
     pos_elem = tablero[ind_nueva_fila][ind_nueva_col]
 
+        
     if pos_elem == OBSTACULO:
-        return "derrota", pos_jugador, manzanas_comidas
+        vidas -= 1
 
+        # Borra al jugador de la posición actual
+        tablero[ind_actual_fila][ind_actual_col] = VACIO
+
+        # Volver a la posición inicial
+        col, fila = pos_inicial
+        tablero[fila][col] = JUGADOR
+        direccion = (0,0)
+
+        if vidas <= 0:
+            return "derrota", pos_inicial, manzanas_comidas, vidas, direccion
+
+        return "ok", pos_inicial, manzanas_comidas, vidas, direccion
     if pos_elem == MANZANA:
         sonido_manzana.play()
         manzanas_comidas += 1
@@ -88,7 +101,8 @@ def avanzar(tablero, pos_jugador, direccion, manzanas_comidas, sonido_manzana):
 
         # Si llegamos al objetivo, victoria
         if manzanas_comidas >= MANZANAS_PARA_GANAR:
-            return "victoria", (ind_nueva_col, ind_nueva_fila), manzanas_comidas
+            return "victoria", (ind_nueva_col, ind_nueva_fila), manzanas_comidas, vidas,direccion
+        
             
 
 
@@ -96,4 +110,4 @@ def avanzar(tablero, pos_jugador, direccion, manzanas_comidas, sonido_manzana):
     tablero[ind_actual_fila][ind_actual_col] = VACIO
     tablero[ind_nueva_fila][ind_nueva_col] = JUGADOR
 
-    return "ok", (ind_nueva_col, ind_nueva_fila), manzanas_comidas
+    return "ok", (ind_nueva_col, ind_nueva_fila), manzanas_comidas, vidas,direccion

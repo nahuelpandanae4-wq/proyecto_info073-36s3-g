@@ -78,5 +78,7 @@ def reiniciar():
 
     # Colocamos al jugador en una posición aleatoria.
     pos_jugador = aparecer_aleatorio(tablero, JUGADOR)
+    pos_inicial = pos_jugador
+    vidas = 3
 
-    return tablero, pos_jugador
+    return tablero, pos_jugador, pos_inicial, vidas
