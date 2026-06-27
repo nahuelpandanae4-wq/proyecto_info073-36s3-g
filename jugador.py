@@ -69,7 +69,20 @@ def avanzar(tablero, pos_jugador,pos_inicial, direccion, manzanas_comidas, sonid
 
     # Verificamos que no haya choque con el borde del tablero.
     if not (0 <= ind_nueva_col < COLUMNAS and 0 <= ind_nueva_fila < FILAS):
-            return "derrota", pos_jugador, manzanas_comidas, vidas, direccion
+        vidas -= 1
+
+        # Borra al jugador de la posición actual
+        tablero[ind_actual_fila][ind_actual_col] = VACIO
+
+        # Volver a la posición inicial
+        col, fila = pos_inicial
+        tablero[fila][col] = JUGADOR
+        direccion = (0, 0)
+
+        if vidas <= 0:
+            return "derrota", pos_inicial, manzanas_comidas, vidas, direccion
+
+        return "ok", pos_inicial, manzanas_comidas, vidas, direccion
 
     # Obtenemos el elemento que se encuentre en el tablero en la nueva posición del jugador.
     pos_elem = tablero[ind_nueva_fila][ind_nueva_col]

@@ -3,7 +3,7 @@ import pygame
 
 from configuracion import *
 
-def dibujar_panel ( screen ) :
+def dibujar_panel ( screen) :
 
     alto_elem = LADO_TABLERO / FILAS
     ancho_elem = LADO_TABLERO / COLUMNAS
@@ -24,8 +24,8 @@ def dibujar_panel ( screen ) :
     screen . blit ( titulo , (x , 30) )
 
     pygame.draw.circle(screen, "red",(screen.get_width() - 200, 400), radio)
-    pygame.draw.circle(screen, "red",(screen.get_width() - 134, 400), radio)
-    pygame.draw.circle(screen, "red",(screen.get_width() - 68, 400), radio)
+    pygame.draw.circle(screen, "red",(screen.get_width() - 120, 400), radio)
+    pygame.draw.circle(screen, "red",(screen.get_width() - 40, 400), radio)
 
 def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=0,total=3):
     """
@@ -92,7 +92,7 @@ def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=0,total=3):
             pos_x += ancho_elem
         pos_y += alto_elem
 
-    dibujar_panel ( screen )
+    dibujar_panel ( screen)
     # Refresca el contenido que se ve en pantalla.
 
     pygame.display.flip()
