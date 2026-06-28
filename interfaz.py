@@ -3,7 +3,7 @@ import pygame
 
 from configuracion import *
 
-def dibujar_panel ( screen) :
+def dibujar_panel ( screen, vidas = 3) :
 
     alto_elem = LADO_TABLERO / FILAS
     ancho_elem = LADO_TABLERO / COLUMNAS
@@ -23,11 +23,16 @@ def dibujar_panel ( screen) :
     titulo = fuente1 . render (" SNAKE ", True , " white ")
     screen . blit ( titulo , (x , 30) )
 
-    pygame.draw.circle(screen, "red",(screen.get_width() - 200, 400), radio)
-    pygame.draw.circle(screen, "red",(screen.get_width() - 120, 400), radio)
-    pygame.draw.circle(screen, "red",(screen.get_width() - 40, 400), radio)
+    for i in range (vidas):
+        if i == 0:
+            pygame.draw.circle(screen, "red",(screen.get_width() - 200, 400), radio)
+        if i == 1:
+            pygame.draw.circle(screen, "red",(screen.get_width() - 120, 400), radio)
+        if i == 2:
+            pygame.draw.circle(screen, "red",(screen.get_width() - 40, 400), radio)
+        
 
-def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=0,total=3):
+def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=0, total=3, vidas = 3):
     """
     Dibuja el estado actual del tablero en la pantalla.
 
@@ -39,7 +44,7 @@ def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=0,total=3):
     # Rellena la pantalla con el color gris, básicamente pintando
     # por encima de lo que estaba anteriormente.
     screen.fill("gray30")
-
+    
 
     # definicion de disenos de elementos de tablero
     wall = pygame.image.load("imagenes/elementos/cajas.png").convert_alpha ()
@@ -54,7 +59,7 @@ def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=0,total=3):
     manzanas = pygame.transform.scale(manzanas, (ancho_elem, alto_elem))
 
     fondo = pygame.image.load("imagenes/fondo/fondo.jpg").convert()
-    fondo = pygame.transform.scale(fondo, screen.get_size())
+    fondo = pygame.transform.scale(fondo,(LADO_TABLERO, LADO_TABLERO))
     screen.blit(fondo, (0, 0))
 
     # Podemos calcular el tamaño en pixeles que tendrá cada
@@ -92,7 +97,7 @@ def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=0,total=3):
             pos_x += ancho_elem
         pos_y += alto_elem
 
-    dibujar_panel ( screen)
+    dibujar_panel ( screen , vidas)
     # Refresca el contenido que se ve en pantalla.
 
     pygame.display.flip()

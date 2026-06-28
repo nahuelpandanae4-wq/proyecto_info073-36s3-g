@@ -83,7 +83,7 @@ def main():
                         tiempo_inicio_juego = pygame.time.get_ticks()
                         estado = ESTADO_JUGANDO
                         manzanas_comidas = 0
-                        refrescar_tablero(screen, tablero, "01:00", 0, MANZANAS_PARA_GANAR )
+                        refrescar_tablero(screen, tablero, "01:00", 0, MANZANAS_PARA_GANAR)
 
                     if evento.key == pygame.K_ESCAPE:
                         estado = ESTADO_INICIO
@@ -115,7 +115,7 @@ def main():
                     mostrar_pantalla(screen, PANTALLA_VICTORIA)
                 else:
                     tiempo_ultimo_mov = tiempo_actual
-                    refrescar_tablero(screen, tablero, manzanas_comidas, MANZANAS_PARA_GANAR)
+                    refrescar_tablero(screen,tablero,tiempo_restante,manzanas_comidas, MANZANAS_PARA_GANAR ,vidas)
                     mostrar_temporizador(screen, tiempo_restante)
             else:
                  mostrar_temporizador(screen, tiempo_restante)
