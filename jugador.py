@@ -41,7 +41,7 @@ def cambiar_direccion(keys, direccion_actual):
     return direccion_actual
 
 
-def avanzar(tablero, pos_jugador,pos_inicial, direccion, manzanas_comidas, sonido_manzana, vidas):
+def avanzar(tablero, pos_jugador,pos_inicial, direccion, manzanas_comidas, sonido_manzana, sonido_daño, vidas):
     """
     Avanza el jugador un paso en la dirección dada.
 
@@ -69,6 +69,7 @@ def avanzar(tablero, pos_jugador,pos_inicial, direccion, manzanas_comidas, sonid
 
     # Verificamos que no haya choque con el borde del tablero.
     if not (0 <= ind_nueva_col < COLUMNAS and 0 <= ind_nueva_fila < FILAS):
+        sonido_daño.play()
         vidas -= 1
 
         # Borra al jugador de la posición actual
@@ -89,6 +90,7 @@ def avanzar(tablero, pos_jugador,pos_inicial, direccion, manzanas_comidas, sonid
 
         
     if pos_elem == OBSTACULO:
+        sonido_daño.play()
         vidas -= 1
 
         # Borra al jugador de la posición actual

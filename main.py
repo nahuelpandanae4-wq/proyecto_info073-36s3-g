@@ -37,8 +37,9 @@ def main():
     mostrar_pantalla(screen, PANTALLA_INICIO)
 
     sonido_manzana = pygame.mixer.Sound("sonidos/interacciones/manzana.wav")
+    sonido_daño = pygame.mixer.Sound("sonidos/interacciones/daño.wav")
 
-    pygame.mixer.music.load("sonidos/principal/durante_juego.mp3")
+    pygame.mixer.music.load("sonidos/principal/menu.mp3")
     pygame.mixer.music.play(-1)
 
 
@@ -58,6 +59,8 @@ def main():
             if evento.type == pygame.KEYDOWN:
                 if estado == ESTADO_INICIO:
                     if evento.key == pygame.K_SPACE:
+                        pygame.mixer.music.load("sonidos/principal/jugando.mp3")
+                        pygame.mixer.music.play(-1)
                         tablero, pos_jugador, pos_inicial, vidas = reiniciar()
                         direccion = (0, 0)
                         # Obtiene tiempo en milisegundos
@@ -77,6 +80,8 @@ def main():
 
                 elif estado in (ESTADO_DERROTA, ESTADO_VICTORIA):
                     if evento.key == pygame.K_r:
+                        pygame.mixer.music.load("sonidos/principal/jugando.mp3")
+                        pygame.mixer.music.play(-1)
                         tablero, pos_jugador, pos_inicial, vidas = reiniciar()
                         direccion = (0, 0)
                         tiempo_ultimo_mov = pygame.time.get_ticks()
@@ -87,6 +92,8 @@ def main():
 
                     if evento.key == pygame.K_ESCAPE:
                         estado = ESTADO_INICIO
+                        pygame.mixer.music.load("sonidos/principal/menu.mp3")
+                        pygame.mixer.music.play(-1)
                         mostrar_pantalla(screen, PANTALLA_INICIO)
 
                 elif estado == ESTADO_JUGANDO:
@@ -106,12 +113,16 @@ def main():
             # La variable RETRASO hace que si no han pasado esa cantidad de ticks,
             # entonces no se avanzará en el tablero.
             elif direccion != (0, 0) and tiempo_actual - tiempo_ultimo_mov >= RETRASO:
-                resultado, pos_jugador, manzanas_comidas, vidas, direccion = avanzar(tablero, pos_jugador, pos_inicial, direccion, manzanas_comidas, sonido_manzana,vidas)
+                resultado, pos_jugador, manzanas_comidas, vidas, direccion = avanzar(tablero, pos_jugador, pos_inicial, direccion, manzanas_comidas, sonido_manzana, sonido_daño, vidas)
                 if resultado == "derrota":
                     estado = ESTADO_DERROTA
+                    pygame.mixer.music.load("sonidos/principal/derrota.mp3")
+                    pygame.mixer.music.play(1)
                     mostrar_pantalla(screen, PANTALLA_DERROTA)
                 elif resultado == "victoria":
                     estado = ESTADO_VICTORIA
+                    pygame.mixer.music.load("sonidos/principal/victoria.mp3")
+                    pygame.mixer.music.play(1)
                     mostrar_pantalla(screen, PANTALLA_VICTORIA)
                 else:
                     tiempo_ultimo_mov = tiempo_actual
