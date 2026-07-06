@@ -152,3 +152,8 @@ def avanzar_enemigos(tablero,pos_enemigos,pos_jugador,pos_inicial,vidas,sonido_d
                     return "derrota", pos_enemigos, pos_jugador, vidas
 
     return "ok", pos_enemigos, pos_jugador, vidas
+
+  
+
+   
+ 
