@@ -1,6 +1,26 @@
 import pygame
+import random
 
 from configuracion import *
+
+def perder_vida(tablero, pos_jugador, pos_inicial, vidas, sonido_daño):
+    """
+    Resta una vida y devuelve al jugador a la posición inicial.
+    """
+
+    sonido_daño.play()
+
+    vidas -= 1
+
+    col, fila = pos_jugador
+    tablero[fila][col] = VACIO
+
+    col_i, fila_i = pos_inicial
+    tablero[fila_i][col_i] = JUGADOR
+
+    direccion = (0, 0)
+
+    return pos_inicial, vidas, direccion
 
 def cambiar_direccion(keys, direccion_actual):
     """
@@ -69,42 +89,22 @@ def avanzar(tablero, pos_jugador,pos_inicial, direccion, manzanas_comidas, sonid
 
     # Verificamos que no haya choque con el borde del tablero.
     if not (0 <= ind_nueva_col < COLUMNAS and 0 <= ind_nueva_fila < FILAS):
-        sonido_daño.play()
-        vidas -= 1
-
-        # Borra al jugador de la posición actual
-        tablero[ind_actual_fila][ind_actual_col] = VACIO
-
-        # Volver a la posición inicial
-        col, fila = pos_inicial
-        tablero[fila][col] = JUGADOR
-        direccion = (0, 0)
-
+        pos_jugador, vidas, direccion = perder_vida(tablero,pos_jugador,pos_inicial,vidas,sonido_daño)
         if vidas <= 0:
-            return "derrota", pos_inicial, manzanas_comidas, vidas, direccion
+            return "derrota", pos_jugador, manzanas_comidas, vidas, direccion
+        return "ok", pos_jugador, manzanas_comidas, vidas, direccion
 
-        return "ok", pos_inicial, manzanas_comidas, vidas, direccion
 
     # Obtenemos el elemento que se encuentre en el tablero en la nueva posición del jugador.
     pos_elem = tablero[ind_nueva_fila][ind_nueva_col]
 
         
-    if pos_elem == OBSTACULO:
-        sonido_daño.play()
-        vidas -= 1
-
-        # Borra al jugador de la posición actual
-        tablero[ind_actual_fila][ind_actual_col] = VACIO
-
-        # Volver a la posición inicial
-        col, fila = pos_inicial
-        tablero[fila][col] = JUGADOR
-        direccion = (0,0)
-
+    if pos_elem == OBSTACULO or pos_elem == ENEMIGO:
+        pos_jugador, vidas, direccion = perder_vida(tablero,pos_jugador,pos_inicial,vidas,sonido_daño)
         if vidas <= 0:
-            return "derrota", pos_inicial, manzanas_comidas, vidas, direccion
+            return "derrota", pos_jugador, manzanas_comidas, vidas, direccion
+        return "ok", pos_jugador, manzanas_comidas, vidas, direccion
 
-        return "ok", pos_inicial, manzanas_comidas, vidas, direccion
     if pos_elem == MANZANA:
         sonido_manzana.play()
         manzanas_comidas += 1
@@ -119,10 +119,36 @@ def avanzar(tablero, pos_jugador,pos_inicial, direccion, manzanas_comidas, sonid
             return "victoria", (ind_nueva_col, ind_nueva_fila), manzanas_comidas, vidas,direccion
         
             
-
-
     # Movimiento normal, si es que no encontramos manzana ni obstáculo.
     tablero[ind_actual_fila][ind_actual_col] = VACIO
     tablero[ind_nueva_fila][ind_nueva_col] = JUGADOR
 
     return "ok", (ind_nueva_col, ind_nueva_fila), manzanas_comidas, vidas,direccion
+
+def obtener_direccion_aleatoria():
+        return random.choice([(0,-1), (0, 1), (-1, 0), (1, 0)])
+
+def avanzar_enemigos(tablero,pos_enemigos,pos_jugador,pos_inicial,vidas,sonido_daño):
+    for i in range(len(pos_enemigos)):
+
+        pos_enemigo = pos_enemigos[i]
+        col, fila = pos_enemigo
+
+        dir_col, dir_fila = obtener_direccion_aleatoria()
+
+        nueva_col = col + dir_col
+        nueva_fila = fila + dir_fila
+        if 0 <= nueva_col < COLUMNAS and 0 <= nueva_fila < FILAS:
+# Si la nueva casilla esta vacia, el enemigo se mueve
+            if tablero[nueva_fila][nueva_col] == VACIO:
+                    tablero[fila][col] = VACIO
+                    tablero[nueva_fila][nueva_col] = ENEMIGO
+                    pos_enemigos[i] = (nueva_col, nueva_fila)
+                    # Si el enemigo pisa a la serpiente, el jugador pierde
+            elif tablero[nueva_fila][nueva_col] == JUGADOR:
+                pos_jugador, vidas, direccion = perder_vida(tablero,pos_jugador,pos_inicial,vidas,sonido_daño)
+
+                if vidas <= 0:
+                    return "derrota", pos_enemigos, pos_jugador, vidas
+
+    return "ok", pos_enemigos, pos_jugador, vidas

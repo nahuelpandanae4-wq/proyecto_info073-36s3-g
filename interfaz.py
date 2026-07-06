@@ -44,13 +44,9 @@ def dibujar_panel ( screen,  vidas = 3, manzanas_comidas = 0) :
 
 
 
-    for i in range (vidas):
-        if i == 0:
-            pygame.draw.circle(screen, "red",(screen.get_width() - 200, 600), radio)
-        if i == 1:
-            pygame.draw.circle(screen, "red",(screen.get_width() - 120, 600), radio)
-        if i == 2:
-            pygame.draw.circle(screen, "red",(screen.get_width() - 40, 600), radio)
+    for i in range(vidas):
+        x = screen.get_width() - 200 + i*80
+        pygame.draw.circle(screen,"red",(x,400),radio)
         
 
 def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=3, total=3, vidas = 3):
@@ -70,7 +66,8 @@ def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=3, total=3,
     # definicion de disenos de elementos de tablero
     wall = pygame.image.load("imagenes/elementos/cajas.png").convert_alpha ()
     imagen_tuercas= pygame.image.load("imagenes/elementos/tuercas.png").convert_alpha ()
-    
+    enemigo = pygame.image.load("imagenes/elementos/eagle.png").convert_alpha()
+
     alto_elem = LADO_TABLERO / FILAS
     ancho_elem = LADO_TABLERO / COLUMNAS
     radio = ancho_elem / 2
@@ -110,7 +107,8 @@ def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=3, total=3,
                 # de tamaño (ancho_elem, alto_elem) y color negro.
             elif tablero[i][j] == MANZANA:
                screen.blit(imagen_tuercas, [pos_x, pos_y])
-
+            elif tablero[i][j] == ENEMIGO:
+                screen.blit(enemigo, [pos_x, pos_y])
 
             # Estamos recorriendo los píxeles de la pantalla, por lo que
             # debemos sumar el ancho y altura en pixeles de cada elemento que

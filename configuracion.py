@@ -32,10 +32,11 @@ VACIO = 0
 OBSTACULO = 1
 JUGADOR = 2
 MANZANA = 3
-
+ENEMIGO = 4 # Identificador para enemigos en el tablero
 
 MANZANAS_PARA_GANAR = 3
-
+CANT_ENEMIGOS = 3 # Cantidad enemigos en tablero
+RETRASO_ENEMIGOS = 200 # Cada cuanto se movera el enemigo
 
 TIEMPO_LIMITE = 60
 RETRASO = 200

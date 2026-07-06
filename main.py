@@ -2,7 +2,7 @@ import pygame
 
 from configuracion import *
 from tablero import reiniciar
-from jugador import cambiar_direccion, avanzar
+from jugador import cambiar_direccion, avanzar, avanzar_enemigos
 from interfaz import (
     refrescar_tablero,
     mostrar_pantalla,
@@ -28,9 +28,14 @@ def main():
     tiempo_ultimo_mov = 0
     manzanas_comidas = 0
     vidas = 3
+
     # TEMPORIZADOR - Variable para rastrear cuándo comenzó el juego
     tiempo_inicio_juego = 0
-    
+
+    tiempo_ultimo_mov = 0
+    tiempo_ultimo_mov_enemigos = 0 # Anadimos la variable de tiempo
+    pos_enemigos = [] # Inicializamos la lista vacia   
+
     # TEMPORIZADOR - Clock para controlar la velocidad de actualización
     clock = pygame.time.Clock()
 
@@ -61,13 +66,14 @@ def main():
                     if evento.key == pygame.K_SPACE:
                         pygame.mixer.music.load("sonidos/principal/jugando.mp3")
                         pygame.mixer.music.play(-1)
-                        tablero, pos_jugador, pos_inicial, vidas = reiniciar()
+                        tablero, pos_jugador, pos_inicial, pos_enemigos = reiniciar()
                         direccion = (0, 0)
                         # Obtiene tiempo en milisegundos
                         tiempo_ultimo_mov = pygame.time.get_ticks()
                         tiempo_inicio_juego = pygame.time.get_ticks()
                         estado = ESTADO_JUGANDO
                         manzanas_comidas = 0
+                        vidas = 3
                         refrescar_tablero(screen, tablero, "01:00", 0, MANZANAS_PARA_GANAR)
                         tiempo_inicio = pygame.time.get_ticks() #Reinicia tiempo a 1 minuto
                     elif evento.key == pygame.K_i:
@@ -82,12 +88,13 @@ def main():
                     if evento.key == pygame.K_r:
                         pygame.mixer.music.load("sonidos/principal/jugando.mp3")
                         pygame.mixer.music.play(-1)
-                        tablero, pos_jugador, pos_inicial, vidas = reiniciar()
+                        tablero, pos_jugador, pos_inicial, pos_enemigos = reiniciar()
                         direccion = (0, 0)
                         tiempo_ultimo_mov = pygame.time.get_ticks()
                         tiempo_inicio_juego = pygame.time.get_ticks()
                         estado = ESTADO_JUGANDO
                         manzanas_comidas = 0
+                        vidas = 3
                         refrescar_tablero(screen, tablero, "01:00", 0, MANZANAS_PARA_GANAR, )
 
                     if evento.key == pygame.K_ESCAPE:
@@ -101,6 +108,7 @@ def main():
 
         if estado == ESTADO_JUGANDO:
             tiempo_actual = pygame.time.get_ticks()  # En milisegundos
+            tiempo_actual_enemigos = pygame.time.get_ticks()
 
             tiempo_transcurrido = (tiempo_actual - tiempo_inicio_juego) // 1000  # Convertir a segundos
             tiempo_restante = TIEMPO_LIMITE - tiempo_transcurrido
@@ -133,6 +141,15 @@ def main():
             else:
                  mostrar_temporizador(screen, tiempo_restante)
 
+            if tiempo_actual_enemigos- tiempo_ultimo_mov_enemigos >=RETRASO_ENEMIGOS:
+                resultado, pos_enemigos, pos_jugador, vidas = avanzar_enemigos(tablero,pos_enemigos,pos_jugador,pos_inicial,vidas,sonido_daño)
+                if resultado == "derrota":
+                    estado = ESTADO_DERROTA
+                    mostrar_pantalla(screen, PANTALLA_DERROTA)
+                else:
+                    
+                    tiempo_ultimo_mov_enemigos = tiempo_actual_enemigos
+                    refrescar_tablero(screen,tablero,tiempo_restante,manzanas_comidas, MANZANAS_PARA_GANAR ,vidas)
 
     pygame.quit()
 
