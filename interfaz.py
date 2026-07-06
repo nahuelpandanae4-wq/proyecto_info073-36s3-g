@@ -20,7 +20,7 @@ def dibujar_panel ( screen,  vidas = 3, manzanas_comidas = 0) :
     fuente1 = pygame.font.Font(None, 36)
     
     # Titulo
-    titulo = fuente1 . render (" ROBOTNATOR ", True , " white ")
+    titulo = fuente1 . render (" ESCAPE ", True , " white ")
     screen . blit ( titulo , (x , 20) )
 
     vida = fuente1 . render (" VIDAS:  ", True, " white ")
@@ -46,8 +46,9 @@ def dibujar_panel ( screen,  vidas = 3, manzanas_comidas = 0) :
 
     for i in range(vidas):
         x = screen.get_width() - 200 + i*80
-        pygame.draw.circle(screen,"red",(x,400),radio)
-        
+        vida = pygame.image.load("imagenes/elementos/vida.png").convert_alpha()
+        vida = pygame.transform.scale(vida, (ancho_elem, alto_elem))
+        screen.blit(vida, (x - ancho_elem/2, 600 - alto_elem/2))
 
 def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=3, total=3, vidas = 3):
     """
@@ -75,7 +76,7 @@ def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=3, total=3,
 
     wall = pygame.transform.scale(wall, (ancho_elem, alto_elem))
     imagen_tuercas = pygame.transform.scale(imagen_tuercas, (ancho_elem, alto_elem))
-
+    enemigo = pygame.transform.scale(enemigo, (ancho_elem, alto_elem))
     fondo = pygame.image.load("imagenes/fondo/fondo.jpg").convert()
     fondo = pygame.transform.scale(fondo,(LADO_TABLERO, LADO_TABLERO))
     screen.blit(fondo, (0, 0))
@@ -103,7 +104,9 @@ def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=3, total=3,
                 screen.blit(wall , [pos_x , pos_y])
             elif tablero[i][j] == JUGADOR:
                 # Dibuja un círculo en la posición (pos_x + radio, pos_y + radio) 
-                pygame.draw.circle(screen, "green", (pos_x + radio, pos_y + radio), radio)
+                jugador = pygame.image.load("imagenes/elementos/personaje.png").convert_alpha()
+                jugador = pygame.transform.scale(jugador, (ancho_elem, alto_elem))
+                screen.blit(jugador, [pos_x, pos_y])
                 # de tamaño (ancho_elem, alto_elem) y color negro.
             elif tablero[i][j] == MANZANA:
                screen.blit(imagen_tuercas, [pos_x, pos_y])
@@ -173,3 +176,5 @@ def mostrar_temporizador(screen, tiempo_restante):
     
     # Actualizar la pantalla
     pygame.display.flip()
+
+   
