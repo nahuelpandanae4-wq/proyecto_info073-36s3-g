@@ -62,24 +62,19 @@ def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=3, total=3,
     # Rellena la pantalla con el color gris, básicamente pintando
     # por encima de lo que estaba anteriormente.
     screen.fill("gray30")
+
     
-
-    # definicion de disenos de elementos de tablero
-    wall = pygame.image.load("imagenes/elementos/cajas.png").convert_alpha ()
-    imagen_tuercas= pygame.image.load("imagenes/elementos/tuercas.png").convert_alpha ()
-    enemigo = pygame.image.load("imagenes/elementos/eagle.png").convert_alpha()
-
     alto_elem = LADO_TABLERO / FILAS
     ancho_elem = LADO_TABLERO / COLUMNAS
     radio = ancho_elem / 2
 
+    JUGADOR_IMG = pygame.transform.scale(pygame.image.load("imagenes/elementos/personaje.png").convert_alpha(),(ancho_elem, alto_elem))
+    ENEMIGO_IMG =pygame.transform.scale( pygame.image.load("imagenes/elementos/eagle.png").convert_alpha (),(ancho_elem, alto_elem))
+    MURO_IMG = pygame.transform.scale(pygame.image.load("imagenes/elementos/cajas.png").convert_alpha (),(ancho_elem, alto_elem))
+    TUERCA_IMG = pygame.transform.scale(pygame.image.load("imagenes/elementos/tuercas.png").convert_alpha (),(ancho_elem, alto_elem))
+    FONDO_IMG = pygame.transform.scale(pygame.image.load("imagenes/fondo/fondo.jpg").convert_alpha (),(LADO_TABLERO, LADO_TABLERO))
 
-    wall = pygame.transform.scale(wall, (ancho_elem, alto_elem))
-    imagen_tuercas = pygame.transform.scale(imagen_tuercas, (ancho_elem, alto_elem))
-    enemigo = pygame.transform.scale(enemigo, (ancho_elem, alto_elem))
-    fondo = pygame.image.load("imagenes/fondo/fondo.jpg").convert()
-    fondo = pygame.transform.scale(fondo,(LADO_TABLERO, LADO_TABLERO))
-    screen.blit(fondo, (0, 0))
+    screen.blit(FONDO_IMG, (0, 0))
 
     # Podemos calcular el tamaño en pixeles que tendrá cada
 
@@ -101,17 +96,15 @@ def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=3, total=3,
         for j in range(COLUMNAS):
             if tablero[i][j] == OBSTACULO:
                 # Dibuja un rectángulo en la posición (pos_x, pos_y) y que sea
-                screen.blit(wall , [pos_x , pos_y])
+                screen.blit(MURO_IMG , [pos_x , pos_y])
             elif tablero[i][j] == JUGADOR:
-                # Dibuja un círculo en la posición (pos_x + radio, pos_y + radio) 
-                jugador = pygame.image.load("imagenes/elementos/personaje.png").convert_alpha()
-                jugador = pygame.transform.scale(jugador, (ancho_elem, alto_elem))
-                screen.blit(jugador, [pos_x, pos_y])
+
+                screen.blit(JUGADOR_IMG, [pos_x, pos_y])
                 # de tamaño (ancho_elem, alto_elem) y color negro.
             elif tablero[i][j] == MANZANA:
-               screen.blit(imagen_tuercas, [pos_x, pos_y])
+               screen.blit(TUERCA_IMG, [pos_x, pos_y])
             elif tablero[i][j] == ENEMIGO:
-                screen.blit(enemigo, [pos_x, pos_y])
+                screen.blit(ENEMIGO_IMG, [pos_x, pos_y])
 
             # Estamos recorriendo los píxeles de la pantalla, por lo que
             # debemos sumar el ancho y altura en pixeles de cada elemento que
@@ -174,8 +167,6 @@ def mostrar_temporizador(screen, tiempo_restante):
     # Dibujarlo en la esquina superior derecha (con un poco de margen)
     screen.blit(texto, (screen.get_width() - 200, 120))
     
-    # Actualizar la pantalla
-    pygame.display.flip()
 
     
 

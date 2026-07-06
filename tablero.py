@@ -22,7 +22,7 @@ def aparecer_aleatorio(tablero, id_elem, incluir_borde=True):
 
 def poblar_tablero(tablero):
 
-    CANT_OBSTACULOS = random.randint(8,50)
+    CANT_OBSTACULOS = random.randint(10,20)
 
     for i in range(CANT_OBSTACULOS):
         aparecer_aleatorio(tablero, OBSTACULO, incluir_borde=False)
