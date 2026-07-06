@@ -67,8 +67,7 @@ def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=3, total=3,
     # definicion de disenos de elementos de tablero
     wall = pygame.image.load("imagenes/elementos/cajas.png").convert_alpha ()
     imagen_tuercas= pygame.image.load("imagenes/elementos/tuercas.png").convert_alpha ()
-    enemigo = pygame.image.load("imagenes/elementos/enemigo,jpeg").convert_alpha()
-    jugador = pygame.image.load("imagenes/elementos/jugador,jpeg").convert
+    enemigo = pygame.image.load("imagenes/elementos/eagle.png").convert_alpha()
 
     alto_elem = LADO_TABLERO / FILAS
     ancho_elem = LADO_TABLERO / COLUMNAS
@@ -178,4 +177,5 @@ def mostrar_temporizador(screen, tiempo_restante):
     # Actualizar la pantalla
     pygame.display.flip()
 
-   
+    
+
