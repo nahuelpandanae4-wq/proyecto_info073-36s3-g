@@ -88,7 +88,7 @@ def main():
                         tiempo_inicio_juego = pygame.time.get_ticks()
                         estado = ESTADO_JUGANDO
                         manzanas_comidas = 0
-                        refrescar_tablero(screen, tablero, "01:00", 0, MANZANAS_PARA_GANAR)
+                        refrescar_tablero(screen, tablero, "01:00", 0, MANZANAS_PARA_GANAR, )
 
                     if evento.key == pygame.K_ESCAPE:
                         estado = ESTADO_INICIO
@@ -108,6 +108,8 @@ def main():
 
             if tiempo_restante <= 0:
                 estado = ESTADO_DERROTA
+                pygame.mixer.music.load("sonidos/principal/derrota.mp3")
+                pygame.mixer.music.play(1)
                 mostrar_pantalla(screen, PANTALLA_DERROTA)
 
             # La variable RETRASO hace que si no han pasado esa cantidad de ticks,

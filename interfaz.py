@@ -3,7 +3,7 @@ import pygame
 
 from configuracion import *
 
-def dibujar_panel ( screen, vidas = 3) :
+def dibujar_panel ( screen,  vidas = 3, manzanas_comidas = 0) :
 
     alto_elem = LADO_TABLERO / FILAS
     ancho_elem = LADO_TABLERO / COLUMNAS
@@ -20,19 +20,40 @@ def dibujar_panel ( screen, vidas = 3) :
     fuente1 = pygame.font.Font(None, 36)
     
     # Titulo
-    titulo = fuente1 . render (" SNAKE ", True , " white ")
-    screen . blit ( titulo , (x , 30) )
+    titulo = fuente1 . render (" ROBOTNATOR ", True , " white ")
+    screen . blit ( titulo , (x , 20) )
+
+    vida = fuente1 . render (" VIDAS:  ", True, " white ")
+    screen . blit (vida , (x + 26, 520))
+
+    tuercas = fuente1 . render (" TUERCAS:  ", True , " white ")
+    screen . blit (tuercas, ( x + 24, 265))
+
+    imagen_tuerca = pygame.image.load("imagenes/elementos/tuercas.png").convert_alpha()
+    imagen_tuerca = pygame.transform.scale(imagen_tuerca, (80, 80))
+
+    imagen_tuerca_gris = imagen_tuerca.copy()
+    imagen_tuerca_gris.fill((80, 80, 80, 180), special_flags=pygame.BLEND_RGBA_MULT)
+
+    for i in range(MANZANAS_PARA_GANAR):
+        if i < manzanas_comidas:
+            screen.blit(imagen_tuerca, (x + i * 60, 300))
+        else:
+            screen.blit(imagen_tuerca_gris, (x + i * 60, 300))
+
+
+
 
     for i in range (vidas):
         if i == 0:
-            pygame.draw.circle(screen, "red",(screen.get_width() - 200, 400), radio)
+            pygame.draw.circle(screen, "red",(screen.get_width() - 200, 600), radio)
         if i == 1:
-            pygame.draw.circle(screen, "red",(screen.get_width() - 120, 400), radio)
+            pygame.draw.circle(screen, "red",(screen.get_width() - 120, 600), radio)
         if i == 2:
-            pygame.draw.circle(screen, "red",(screen.get_width() - 40, 400), radio)
+            pygame.draw.circle(screen, "red",(screen.get_width() - 40, 600), radio)
         
 
-def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=0, total=3, vidas = 3):
+def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=3, total=3, vidas = 3):
     """
     Dibuja el estado actual del tablero en la pantalla.
 
@@ -48,7 +69,7 @@ def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=0, total=3,
 
     # definicion de disenos de elementos de tablero
     wall = pygame.image.load("imagenes/elementos/cajas.png").convert_alpha ()
-    manzanas= pygame.image.load("imagenes/elementos/tuercas.png").convert_alpha ()
+    imagen_tuercas= pygame.image.load("imagenes/elementos/tuercas.png").convert_alpha ()
     
     alto_elem = LADO_TABLERO / FILAS
     ancho_elem = LADO_TABLERO / COLUMNAS
@@ -56,7 +77,7 @@ def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=0, total=3,
 
 
     wall = pygame.transform.scale(wall, (ancho_elem, alto_elem))
-    manzanas = pygame.transform.scale(manzanas, (ancho_elem, alto_elem))
+    imagen_tuercas = pygame.transform.scale(imagen_tuercas, (ancho_elem, alto_elem))
 
     fondo = pygame.image.load("imagenes/fondo/fondo.jpg").convert()
     fondo = pygame.transform.scale(fondo,(LADO_TABLERO, LADO_TABLERO))
@@ -88,7 +109,7 @@ def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=0, total=3,
                 pygame.draw.circle(screen, "green", (pos_x + radio, pos_y + radio), radio)
                 # de tamaño (ancho_elem, alto_elem) y color negro.
             elif tablero[i][j] == MANZANA:
-               screen.blit(manzanas, [pos_x, pos_y])
+               screen.blit(imagen_tuercas, [pos_x, pos_y])
 
 
             # Estamos recorriendo los píxeles de la pantalla, por lo que
@@ -97,7 +118,7 @@ def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=0, total=3,
             pos_x += ancho_elem
         pos_y += alto_elem
 
-    dibujar_panel ( screen , vidas)
+    dibujar_panel ( screen , vidas, manzanas_comidas = manzanas)
     # Refresca el contenido que se ve en pantalla.
 
     pygame.display.flip()
@@ -136,6 +157,10 @@ def mostrar_temporizador(screen, tiempo_restante):
         - screen: La pantalla donde mostrar el temporizador.
         - tiempo_restante: Segundos restantes.
     """
+
+    fondo_temporizador = pygame.Rect(screen.get_width() - 220, 120, 210, 40)
+    pygame.draw.rect(screen, "gray15", fondo_temporizador)
+
     # Crear fuente (tamaño 36)
     fuente = pygame.font.Font(None, 36)
     
@@ -146,7 +171,7 @@ def mostrar_temporizador(screen, tiempo_restante):
     texto = fuente.render(f"Tiempo: {tiempo_restante}s", True, color)
     
     # Dibujarlo en la esquina superior derecha (con un poco de margen)
-    screen.blit(texto, (screen.get_width() - 200, 50))
+    screen.blit(texto, (screen.get_width() - 200, 120))
     
     # Actualizar la pantalla
     pygame.display.flip()
