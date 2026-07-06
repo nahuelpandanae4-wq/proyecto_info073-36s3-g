@@ -3,6 +3,70 @@ import pygame
 
 from configuracion import *
 
+JUGADOR_IMG = None
+ENEMIGO_IMG = None
+MURO_IMG = None
+TUERCA_IMG = None
+FONDO_IMG = None
+VIDA_IMG = None
+TUERCA_PANEL = None
+TUERCA_PANEL_GRIS = None
+
+
+def cargar_imagenes():
+    global JUGADOR_IMG
+    global ENEMIGO_IMG
+    global MURO_IMG
+    global TUERCA_IMG
+    global FONDO_IMG
+    global VIDA_IMG
+    global TUERCA_PANEL
+    global TUERCA_PANEL_GRIS
+
+    alto_elem = LADO_TABLERO // FILAS
+    ancho_elem = LADO_TABLERO // COLUMNAS
+
+    JUGADOR_IMG = pygame.transform.scale(
+        pygame.image.load("imagenes/elementos/personaje.png").convert_alpha(),
+        (ancho_elem, alto_elem)
+    )
+
+    ENEMIGO_IMG = pygame.transform.scale(
+        pygame.image.load("imagenes/elementos/eagle.png").convert_alpha(),
+        (ancho_elem, alto_elem)
+    )
+
+    MURO_IMG = pygame.transform.scale(
+        pygame.image.load("imagenes/elementos/cajas.png").convert_alpha(),
+        (ancho_elem, alto_elem)
+    )
+
+    TUERCA_IMG = pygame.transform.scale(
+        pygame.image.load("imagenes/elementos/tuercas.png").convert_alpha(),
+        (ancho_elem, alto_elem)
+    )
+
+    FONDO_IMG = pygame.transform.scale(
+        pygame.image.load("imagenes/fondo/fondo.jpg").convert(),
+        (LADO_TABLERO, LADO_TABLERO)
+    )
+
+    VIDA_IMG = pygame.transform.scale(
+        pygame.image.load("imagenes/elementos/vida.png").convert_alpha(),
+        (ancho_elem, alto_elem)
+    )
+
+    TUERCA_PANEL = pygame.transform.scale(
+        pygame.image.load("imagenes/elementos/tuercas.png").convert_alpha(),
+        (80, 80)
+    )
+
+    TUERCA_PANEL_GRIS = TUERCA_PANEL.copy()
+    TUERCA_PANEL_GRIS.fill(
+        (80, 80, 80, 180),
+        special_flags=pygame.BLEND_RGBA_MULT,
+    )
+
 def dibujar_panel ( screen,  vidas = 3, manzanas_comidas = 0) :
 
     alto_elem = LADO_TABLERO / FILAS
@@ -67,12 +131,6 @@ def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=3, total=3,
     alto_elem = LADO_TABLERO / FILAS
     ancho_elem = LADO_TABLERO / COLUMNAS
     radio = ancho_elem / 2
-
-    JUGADOR_IMG = pygame.transform.scale(pygame.image.load("imagenes/elementos/personaje.png").convert_alpha(),(ancho_elem, alto_elem))
-    ENEMIGO_IMG =pygame.transform.scale( pygame.image.load("imagenes/elementos/eagle.png").convert_alpha (),(ancho_elem, alto_elem))
-    MURO_IMG = pygame.transform.scale(pygame.image.load("imagenes/elementos/cajas.png").convert_alpha (),(ancho_elem, alto_elem))
-    TUERCA_IMG = pygame.transform.scale(pygame.image.load("imagenes/elementos/tuercas.png").convert_alpha (),(ancho_elem, alto_elem))
-    FONDO_IMG = pygame.transform.scale(pygame.image.load("imagenes/fondo/fondo.jpg").convert_alpha (),(LADO_TABLERO, LADO_TABLERO))
 
     screen.blit(FONDO_IMG, (0, 0))
 

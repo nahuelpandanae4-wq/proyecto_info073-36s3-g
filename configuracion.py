@@ -39,7 +39,7 @@ CANT_ENEMIGOS = 3 # Cantidad enemigos en tablero
 RETRASO_ENEMIGOS = 200 # Cada cuanto se movera el enemigo
 
 TIEMPO_LIMITE = 60
-RETRASO = 30
+RETRASO = 200
 
 # crea una ruta a la carpeta de las pantallas
 DIR_PANTALLAS = os.path.join(os.path.dirname(__file__),"data","pantallas")

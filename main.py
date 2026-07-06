@@ -7,6 +7,7 @@ from interfaz import (
     refrescar_tablero,
     mostrar_pantalla,
     mostrar_temporizador,
+    cargar_imagenes
 )
 
 
@@ -15,7 +16,7 @@ def main():
 
     # Establecemos la resolución de la pantalla.
     screen = pygame . display . set_mode (( ANCHO_VENTANA , ALTO_VENTANA ) )
-    
+    cargar_imagenes()
     # Establecemos el título de la ventana.
     pygame.display.set_caption("Juego Básico")
 
