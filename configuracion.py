@@ -7,10 +7,10 @@ ESTADO_JUGANDO = "jugando"
 ESTADO_DERROTA = "derrota"
 ESTADO_VICTORIA = "victoria"
 
-PANTALLA_INICIO = "pantalla_inicio.jpeg"
-PANTALLA_INSTRUCCIONES = "pantalla_instrucciones.jpeg"
-PANTALLA_VICTORIA = "pantalla_victoria.jpeg"
-PANTALLA_DERROTA = "pantalla_derrota.jpeg"
+PANTALLA_INICIO = "pantalla_inicio.bmp"
+PANTALLA_INSTRUCCIONES = "pantalla_instrucciones.bmp"
+PANTALLA_VICTORIA = "pantalla_victoria.bmp"
+PANTALLA_DERROTA = "pantalla_derrota.bmp"
 
 # Tamano de la ventana (en pixeles )
 ANCHO_VENTANA = 1040
