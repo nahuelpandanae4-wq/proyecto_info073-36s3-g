@@ -156,8 +156,12 @@ def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=3, total=3,
                 # Dibuja un rectángulo en la posición (pos_x, pos_y) y que sea
                 screen.blit(MURO_IMG , [pos_x , pos_y])
             elif tablero[i][j] == JUGADOR:
+                sombra = pygame.Surface((ancho_elem * 0.75, alto_elem * 0.22), pygame.SRCALPHA)
+                pygame.draw.ellipse(sombra, (0, 0, 0, 120), sombra.get_rect())
 
+                screen.blit(sombra, (pos_x + ancho_elem * 0.125, pos_y + alto_elem * 0.72))
                 screen.blit(JUGADOR_IMG, [pos_x, pos_y])
+
                 # de tamaño (ancho_elem, alto_elem) y color negro.
             elif tablero[i][j] == MANZANA:
                screen.blit(TUERCA_IMG, [pos_x, pos_y])
@@ -225,6 +229,6 @@ def mostrar_temporizador(screen, tiempo_restante):
     # Dibujarlo en la esquina superior derecha (con un poco de margen)
     screen.blit(texto, (screen.get_width() - 200, 120))
     
-
+    pygame.display.flip()
     
 

@@ -2,7 +2,7 @@ import pygame
 
 from configuracion import *
 from tablero import reiniciar
-from jugador import cambiar_direccion, avanzar, avanzar_enemigos
+from jugador import cambiar_direccion_por_tecla, avanzar, avanzar_enemigos
 from interfaz import (
     refrescar_tablero,
     mostrar_pantalla,
@@ -18,7 +18,7 @@ def main():
     screen = pygame . display . set_mode (( ANCHO_VENTANA , ALTO_VENTANA ) )
     cargar_imagenes()
     # Establecemos el título de la ventana.
-    pygame.display.set_caption("Juego Básico")
+    pygame.display.set_caption("SCAPE-MINATOR")
 
     running = True
 
@@ -26,6 +26,7 @@ def main():
     tablero = []
     pos_jugador = (0, 0)
     direccion = (0, 0)
+    direccion_pendiente = (0, 0)
     tiempo_ultimo_mov = 0
     manzanas_comidas = 0
     vidas = 3
@@ -69,6 +70,7 @@ def main():
                         pygame.mixer.music.play(-1)
                         tablero, pos_jugador, pos_inicial, pos_enemigos = reiniciar()
                         direccion = (0, 0)
+                        direccion_pendiente = (0, 0)
                         # Obtiene tiempo en milisegundos
                         tiempo_ultimo_mov = pygame.time.get_ticks()
                         tiempo_inicio_juego = pygame.time.get_ticks()
@@ -91,6 +93,7 @@ def main():
                         pygame.mixer.music.play(-1)
                         tablero, pos_jugador, pos_inicial, pos_enemigos = reiniciar()
                         direccion = (0, 0)
+                        direccion_pendiente = (0, 0)
                         tiempo_ultimo_mov = pygame.time.get_ticks()
                         tiempo_inicio_juego = pygame.time.get_ticks()
                         estado = ESTADO_JUGANDO
@@ -104,10 +107,11 @@ def main():
                         pygame.mixer.music.play(-1)
                         mostrar_pantalla(screen, PANTALLA_INICIO)
 
+                elif estado == ESTADO_JUGANDO:
+                    direccion_pendiente = cambiar_direccion_por_tecla(evento.key,direccion_pendiente)
 
         if estado == ESTADO_JUGANDO:
-            direccion = cambiar_direccion(pygame.key.get_pressed(),direccion)
-
+           
             tiempo_actual = pygame.time.get_ticks()  # En milisegundos
             tiempo_actual_enemigos = pygame.time.get_ticks()
 
@@ -125,8 +129,11 @@ def main():
 
             # La variable RETRASO hace que si no han pasado esa cantidad de ticks,
             # entonces no se avanzará en el tablero.
-            elif direccion != (0, 0) and tiempo_actual - tiempo_ultimo_mov >= RETRASO:
+            elif direccion_pendiente != (0, 0) and tiempo_actual - tiempo_ultimo_mov >= RETRASO:
+                direccion = direccion_pendiente
                 resultado, pos_jugador, manzanas_comidas, vidas, direccion = avanzar(tablero, pos_jugador, pos_inicial, direccion, manzanas_comidas, sonido_manzana, sonido_daño, vidas)
+                if direccion == (0, 0):
+                    direccion_pendiente = (0, 0)
                 if resultado == "derrota":
                     estado = ESTADO_DERROTA
                     pygame.mixer.music.load("sonidos/principal/derrota.mp3")
@@ -147,11 +154,15 @@ def main():
                     refrescar_tablero(screen,tablero,tiempo_restante,manzanas_comidas, MANZANAS_PARA_GANAR ,vidas)
                     mostrar_temporizador(screen, tiempo_restante)
             else:
-                mostrar_temporizador(screen, tiempo_restante)
                 refrescar_tablero(screen,tablero,tiempo_restante,manzanas_comidas,MANZANAS_PARA_GANAR,vidas)
+                mostrar_temporizador(screen, tiempo_restante)
 
             if tiempo_actual_enemigos- tiempo_ultimo_mov_enemigos >=RETRASO_ENEMIGOS:
                 resultado, pos_enemigos, pos_jugador, vidas = avanzar_enemigos(tablero,pos_enemigos,pos_jugador,pos_inicial,vidas,sonido_daño)
+                vidas_antes = vidas
+                if vidas < vidas_antes:
+                    direccion = (0, 0)
+                    direccion_pendiente = (0, 0)
                 if resultado == "derrota":
                     estado = ESTADO_DERROTA
                     pygame.mixer.music.load("sonidos/principal/derrota.mp3")
@@ -162,7 +173,7 @@ def main():
 
                 tiempo_ultimo_mov_enemigos = tiempo_actual_enemigos
                 refrescar_tablero(screen,tablero,tiempo_restante,manzanas_comidas,MANZANAS_PARA_GANAR,vidas)
- 
+                mostrar_temporizador(screen, tiempo_restante)
     pygame.quit()
 
 

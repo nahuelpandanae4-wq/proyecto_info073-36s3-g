@@ -22,44 +22,17 @@ def perder_vida(tablero, pos_jugador, pos_inicial, vidas, sonido_daño):
 
     return pos_inicial, vidas, direccion
 
-def cambiar_direccion(keys, direccion_actual):
-    """
-    Cambia la dirección del jugador.
-
-    Parámetros:
-        - keys: Arreglo de teclas presionadas.
-        - direccion_actual: La dirección en la que estaba avanzando justo antes de analizar
-            si hubo un cambio de dirección.
-
-    Retorna:
-        - direccion_actual: La nueva dirección del jugador.
-    """
-
-    # Tecla W
-    if keys[pygame.K_w]:
-        # La tupla nos indica que horizontalmente (columnas) no hará nada (0) y
-        # que verticalmente (filas) disminuirá el índice en el tablero (-1).
+def cambiar_direccion_por_tecla(tecla, direccion_actual):
+    if tecla == pygame.K_w:
         return (0, -1)
-
-    # Tecla S
-    if keys[pygame.K_s]:
-        # En este caso avanzará a través de las filas del tablero.
+    if tecla == pygame.K_s:
         return (0, 1)
-
-    # Tecla A
-    if keys[pygame.K_a]:
-        # Retrocede por las columnas del tablero.
+    if tecla == pygame.K_a:
         return (-1, 0)
-
-    # Tecla D
-    if keys[pygame.K_d]:
-        # Avanza por las columnas del tablero.
+    if tecla == pygame.K_d:
         return (1, 0)
 
-    # Si no se presiona ninguna de las teclas anteriores, la dirección
-    # será la misma que la anterior.
     return direccion_actual
-
 
 def avanzar(tablero, pos_jugador,pos_inicial, direccion, manzanas_comidas, sonido_manzana, sonido_daño, vidas):
     """
@@ -125,8 +98,9 @@ def avanzar(tablero, pos_jugador,pos_inicial, direccion, manzanas_comidas, sonid
 
     return "ok", (ind_nueva_col, ind_nueva_fila), manzanas_comidas, vidas,direccion
 
-def obtener_direccion_aleatoria():
-        return random.choice([(0,-1), (0, 1), (-1, 0), (1, 0)])
+def obtener_direccion_aleatoria(direcciones):
+        
+        return random.choice(direcciones)
 
 def avanzar_enemigos(tablero,pos_enemigos,pos_jugador,pos_inicial,vidas,sonido_daño):
     for i in range(len(pos_enemigos)):
@@ -134,16 +108,21 @@ def avanzar_enemigos(tablero,pos_enemigos,pos_jugador,pos_inicial,vidas,sonido_d
         pos_enemigo = pos_enemigos[i]
         col, fila = pos_enemigo
 
-        dir_col, dir_fila = obtener_direccion_aleatoria()
+        direcciones = [(0,-1), (0, 1), (-1, 0), (1, 0)]
+
+        dir_col, dir_fila = obtener_direccion_aleatoria(direcciones)
 
         nueva_col = col + dir_col
         nueva_fila = fila + dir_fila
+        
         if 0 <= nueva_col < COLUMNAS and 0 <= nueva_fila < FILAS:
-# Si la nueva casilla esta vacia, el enemigo se mueve
+
+            # Si la nueva casilla esta vacia, el enemigo se mueve
             if tablero[nueva_fila][nueva_col] == VACIO:
                     tablero[fila][col] = VACIO
                     tablero[nueva_fila][nueva_col] = ENEMIGO
                     pos_enemigos[i] = (nueva_col, nueva_fila)
+
                     # Si el enemigo pisa a la serpiente, el jugador pierde
             elif tablero[nueva_fila][nueva_col] == JUGADOR:
                 pos_jugador, vidas, direccion = perder_vida(tablero,pos_jugador,pos_inicial,vidas,sonido_daño)
