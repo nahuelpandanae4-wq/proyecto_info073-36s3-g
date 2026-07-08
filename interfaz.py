@@ -11,6 +11,7 @@ FONDO_IMG = None
 VIDA_IMG = None
 TUERCA_PANEL = None
 TUERCA_PANEL_GRIS = None
+ACEITE_IMG = None
 
 
 def cargar_imagenes():
@@ -22,6 +23,7 @@ def cargar_imagenes():
     global VIDA_IMG
     global TUERCA_PANEL
     global TUERCA_PANEL_GRIS
+    global ACEITE_IMG
 
     alto_elem = LADO_TABLERO // FILAS
     ancho_elem = LADO_TABLERO // COLUMNAS
@@ -65,6 +67,11 @@ def cargar_imagenes():
     TUERCA_PANEL_GRIS.fill(
         (80, 80, 80, 180),
         special_flags=pygame.BLEND_RGBA_MULT,
+    )
+
+    ACEITE_IMG = pygame.transform.scale(
+        pygame.image.load("imagenes/elementos/aceite.png").convert_alpha(),
+        (ancho_elem, alto_elem)
     )
 
 def dibujar_panel ( screen,  vidas = 3, manzanas_comidas = 0) :
@@ -158,13 +165,19 @@ def refrescar_tablero(screen,tablero,tiempo_texto= "01=00", manzanas=3, total=3,
             elif tablero[i][j] == JUGADOR:
                 sombra = pygame.Surface((ancho_elem * 0.75, alto_elem * 0.22), pygame.SRCALPHA)
                 pygame.draw.ellipse(sombra, (0, 0, 0, 120), sombra.get_rect())
-
                 screen.blit(sombra, (pos_x + ancho_elem * 0.125, pos_y + alto_elem * 0.72))
                 screen.blit(JUGADOR_IMG, [pos_x, pos_y])
+                if tiene_escudo:
+                    burbuja = pygame.Surface((ancho_elem, alto_elem), pygame.SRCALPHA)
+                    pygame.draw.circle(burbuja, (100, 210, 255, 110), (ancho_elem//2, alto_elem//2), ancho_elem//2)
+                    pygame.draw.circle(burbuja, (170, 240, 255, 50), (ancho_elem//2, alto_elem//2), ancho_elem//2 - 4)
+                    screen.blit(burbuja,(pos_x ,pos_y))
 
                 # de tamaño (ancho_elem, alto_elem) y color negro.
             elif tablero[i][j] == MANZANA:
-               screen.blit(TUERCA_IMG, [pos_x, pos_y])
+                screen.blit(TUERCA_IMG, [pos_x, pos_y])
+            elif tablero[i][j] == ACEITE:
+                screen.blit(ACEITE_IMG, [pos_x, pos_y])
             elif tablero[i][j] == ENEMIGO:
                 screen.blit(ENEMIGO_IMG, [pos_x, pos_y])
 
