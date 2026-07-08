@@ -3,10 +3,13 @@ import random
 
 from configuracion import *
 
-def perder_vida(tablero, pos_jugador, pos_inicial, vidas, sonido_daño):
+def perder_vida(tablero, pos_jugador, pos_inicial, vidas, sonido_daño, tiene_escudo):
     """
     Resta una vida y devuelve al jugador a la posición inicial.
     """
+    if tiene_escudo:
+        # Solo se elimina el escudo, sin daño
+        return pos_jugador, vidas, (0,0), False
 
     sonido_daño.play()
 
@@ -34,7 +37,7 @@ def cambiar_direccion_por_tecla(tecla, direccion_actual):
 
     return direccion_actual
 
-def avanzar(tablero, pos_jugador,pos_inicial, direccion, manzanas_comidas, sonido_manzana, sonido_daño, vidas):
+def avanzar(tablero, pos_jugador,pos_inicial, direccion, manzanas_comidas, sonido_manzana, sonido_daño, vidas, tiene_escudo):
     """
     Avanza el jugador un paso en la dirección dada.
 
@@ -62,10 +65,10 @@ def avanzar(tablero, pos_jugador,pos_inicial, direccion, manzanas_comidas, sonid
 
     # Verificamos que no haya choque con el borde del tablero.
     if not (0 <= ind_nueva_col < COLUMNAS and 0 <= ind_nueva_fila < FILAS):
-        pos_jugador, vidas, direccion = perder_vida(tablero,pos_jugador,pos_inicial,vidas,sonido_daño)
+        pos_jugador, vidas, direccion, tiene_escudo = perder_vida(tablero,pos_jugador,pos_inicial,vidas,sonido_daño, tiene_escudo)
         if vidas <= 0:
-            return "derrota", pos_jugador, manzanas_comidas, vidas, direccion
-        return "ok", pos_jugador, manzanas_comidas, vidas, direccion
+            return "derrota", pos_jugador, manzanas_comidas, vidas, direccion, tiene_escudo
+        return "ok", pos_jugador, manzanas_comidas, vidas, direccion, tiene_escudo
 
 
     # Obtenemos el elemento que se encuentre en el tablero en la nueva posición del jugador.
@@ -73,10 +76,10 @@ def avanzar(tablero, pos_jugador,pos_inicial, direccion, manzanas_comidas, sonid
 
         
     if pos_elem == OBSTACULO or pos_elem == ENEMIGO:
-        pos_jugador, vidas, direccion = perder_vida(tablero,pos_jugador,pos_inicial,vidas,sonido_daño)
+        pos_jugador, vidas, direccion, tiene_escudo = perder_vida(tablero,pos_jugador,pos_inicial,vidas,sonido_daño, tiene_escudo)
         if vidas <= 0:
-            return "derrota", pos_jugador, manzanas_comidas, vidas, direccion
-        return "ok", pos_jugador, manzanas_comidas, vidas, direccion
+            return "derrota", pos_jugador, manzanas_comidas, vidas, direccion, tiene_escudo
+        return "ok", pos_jugador, manzanas_comidas, vidas, direccion, tiene_escudo
 
     if pos_elem == MANZANA:
         sonido_manzana.play()
@@ -89,20 +92,30 @@ def avanzar(tablero, pos_jugador,pos_inicial, direccion, manzanas_comidas, sonid
 
         # Si llegamos al objetivo, victoria
         if manzanas_comidas >= MANZANAS_PARA_GANAR:
-            return "victoria", (ind_nueva_col, ind_nueva_fila), manzanas_comidas, vidas,direccion
+            return "victoria", (ind_nueva_col, ind_nueva_fila), manzanas_comidas, vidas,direccion, tiene_escudo
+
+    if pos_elem == ACEITE:
+        sonido_manzana.play()  # Usamos el mismo sonido por ahora
+
+        tablero[ind_actual_fila][ind_actual_col] = VACIO
+
+        tablero[ind_nueva_fila][ind_nueva_col] = JUGADOR
+
+        # Por ahora solo lo recoge, luego agregaremos el escudo
+        return "ok", (ind_nueva_col, ind_nueva_fila), manzanas_comidas, vidas, direccion, True
         
             
     # Movimiento normal, si es que no encontramos manzana ni obstáculo.
     tablero[ind_actual_fila][ind_actual_col] = VACIO
     tablero[ind_nueva_fila][ind_nueva_col] = JUGADOR
 
-    return "ok", (ind_nueva_col, ind_nueva_fila), manzanas_comidas, vidas,direccion
+    return "ok", (ind_nueva_col, ind_nueva_fila), manzanas_comidas, vidas,direccion, tiene_escudo
 
 def obtener_direccion_aleatoria(direcciones):
         
         return random.choice(direcciones)
 
-def avanzar_enemigos(tablero,pos_enemigos,pos_jugador,pos_inicial,vidas,sonido_daño):
+def avanzar_enemigos(tablero,pos_enemigos,pos_jugador,pos_inicial,vidas,sonido_daño, tiene_escudo):
     for i in range(len(pos_enemigos)):
 
         pos_enemigo = pos_enemigos[i]
@@ -125,12 +138,12 @@ def avanzar_enemigos(tablero,pos_enemigos,pos_jugador,pos_inicial,vidas,sonido_d
 
                     # Si el enemigo pisa a la serpiente, el jugador pierde
             elif tablero[nueva_fila][nueva_col] == JUGADOR:
-                pos_jugador, vidas, direccion = perder_vida(tablero,pos_jugador,pos_inicial,vidas,sonido_daño)
+                pos_jugador, vidas, direccion, tiene_escudo = perder_vida(tablero,pos_jugador,pos_inicial,vidas,sonido_daño, tiene_escudo)
 
                 if vidas <= 0:
-                    return "derrota", pos_enemigos, pos_jugador, vidas
+                    return "derrota", pos_enemigos, pos_jugador, vidas, tiene_escudo
 
-    return "ok", pos_enemigos, pos_jugador, vidas
+    return "ok", pos_enemigos, pos_jugador, vidas, tiene_escudo
 
   
 
