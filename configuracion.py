@@ -33,6 +33,7 @@ OBSTACULO = 1
 JUGADOR = 2
 MANZANA = 3
 ENEMIGO = 4 # Identificador para enemigos en el tablero
+ACEITE = 5
 
 MANZANAS_PARA_GANAR = 3
 CANT_ENEMIGOS = 3 # Cantidad enemigos en tablero
