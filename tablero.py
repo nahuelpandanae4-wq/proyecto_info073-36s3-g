@@ -2,7 +2,6 @@ import random
 from configuracion import *
 
 
-
 def aparecer_aleatorio(tablero, id_elem, incluir_borde=True):
     vacios = []
     for fila in range(FILAS):
@@ -29,6 +28,8 @@ def poblar_tablero(tablero):
     aparecer_aleatorio(tablero, MANZANA)
     aparecer_aleatorio(tablero, MANZANA)
     aparecer_aleatorio(tablero, MANZANA)
+    aparecer_aleatorio(tablero, ACEITE)
+    aparecer_aleatorio(tablero, ACEITE)
 
 def reiniciar():
     """
